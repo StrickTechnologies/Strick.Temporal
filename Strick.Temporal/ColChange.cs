@@ -5,9 +5,9 @@ using System.Text;
 
 namespace Strick.Temporal
 {
-	public class ColChg
+	public class ColChange
 	{
-		public ColChg(int ColumnIndex,string ColumnName, object OldValue, object NewValue)
+		public ColChange(int ColumnIndex,string ColumnName, object OldValue, object NewValue)
 		{
 			this.ColumnIndex = ColumnIndex;
 			this.ColumnName = ColumnName;

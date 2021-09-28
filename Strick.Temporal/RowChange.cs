@@ -5,9 +5,9 @@ using System.Text;
 
 namespace Strick.Temporal
 {
-	public class RowChg
+	public class RowChange
 	{
-		public RowChg(int RowIndex, DateTime ChangeTime)
+		public RowChange(int RowIndex, DateTime ChangeTime)
 		{
 			this.RowIndex = RowIndex;
 			this.ChangeTime = ChangeTime;
@@ -27,6 +27,6 @@ namespace Strick.Temporal
 
 		public object Key { get; set; }
 
-		public List<ColChg> ColumnChanges { get; } = new List<ColChg>();
+		public List<ColChange> ColumnChanges { get; } = new List<ColChange>();
 	}
 }

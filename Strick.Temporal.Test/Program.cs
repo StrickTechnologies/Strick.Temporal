@@ -114,7 +114,7 @@ namespace Strick.Temporal.Test
 
 		private static void ShowRC(TemporalComparer tc)
 		{
-			foreach (RowChg rc in tc.Changes)
+			foreach (RowChange rc in tc.Changes)
 			{
 				w($"* Row Change: Index:{rc.RowIndex} At:{rc.ChangeTime}");
 				if (tc.HasKeyColumn)
@@ -129,7 +129,7 @@ namespace Strick.Temporal.Test
 
 				wl("\n  Col changes:");
 
-				foreach (ColChg cc in rc.ColumnChanges)
+				foreach (ColChange cc in rc.ColumnChanges)
 				{ wl($"    {cc.ColumnName} ({cc.ColumnIndex})  old:[{cc.OldValue}] new:[{cc.NewValue}]"); }
 				wl("");
 			}

@@ -20,9 +20,9 @@ namespace Strick.Temporal.Test
 
 			Assert.IsFalse(tc == null);
 
-			List<RowChg> Chgs = tc.Changes.ToList();
+			List<RowChange> rowChanges = tc.Changes.ToList();
 
-			Assert.IsFalse(Chgs == null);
+			Assert.IsNotNull(rowChanges);
 			Assert.AreEqual(7, tc.Changes.Count());
 
 
@@ -30,17 +30,17 @@ namespace Strick.Temporal.Test
 			tc.IncludedColumns.Add(tc.Table.Columns["Salary"]);
 			Assert.IsFalse(tc == null);
 
-			Chgs = tc.Changes.ToList();
+			rowChanges = tc.Changes.ToList();
 
-			Assert.IsFalse(Chgs == null);
+			Assert.IsFalse(rowChanges == null);
 			Assert.AreEqual(6, tc.Changes.Count());
 
 			//look for job title changes
 			tc.IncludedColumns.Clear();
 			tc.IncludedColumns.Add(tc.Table.Columns["JobTitle"]);
-			Chgs = tc.Changes.ToList();
+			rowChanges = tc.Changes.ToList();
 
-			Assert.IsFalse(Chgs == null);
+			Assert.IsFalse(rowChanges == null);
 			Assert.AreEqual(2, tc.Changes.Count());
 
 
@@ -48,9 +48,9 @@ namespace Strick.Temporal.Test
 			tc.IncludedColumns.Clear();
 			tc.IncludedColumns.Add(tc.Table.Columns["TerminationDate"]);
 
-			Chgs = tc.Changes.ToList();
+			rowChanges = tc.Changes.ToList();
 
-			Assert.IsFalse(Chgs == null);
+			Assert.IsFalse(rowChanges == null);
 			Assert.AreEqual(1, tc.Changes.Count());
 
 			//exclude terminations
@@ -58,9 +58,9 @@ namespace Strick.Temporal.Test
 			tc.ExcludedColumns.Add(tc.Table.Columns["TerminationDate"]);
 			tc.ExcludedColumns.Add(tc.Table.Columns["TermReason"]);
 
-			Chgs = tc.Changes.ToList();
+			rowChanges = tc.Changes.ToList();
 
-			Assert.IsFalse(Chgs == null);
+			Assert.IsFalse(rowChanges == null);
 			Assert.AreEqual(6, tc.Changes.Count());
 		}
 

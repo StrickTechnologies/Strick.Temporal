@@ -215,9 +215,9 @@ namespace Strick.Temporal
 		/// ** The returned sequence of changes is NOT cached -- the comparison is run each time this property is accessed.  
 		/// If you need to access the returned changes multiple times, cache the returned value (e.g. IEnumerable<RowChg> MyChanges = myTemporalComparer.Changes;) **
 		/// </summary>
-		public IEnumerable<RowChg> Changes => GetChanges();
+		public IEnumerable<RowChange> Changes => GetChanges();
 
-		protected IEnumerable<RowChg> GetChanges()
+		protected IEnumerable<RowChange> GetChanges()
 		{
 			//if no table or only one record
 			if (Table == null || Table.Rows.Count < 2)
@@ -237,16 +237,16 @@ namespace Strick.Temporal
 					{ break; }
 				}
 
-				RowChg chg = CompareRows(Table.Rows[r], Table.Rows[r - 1]);
+				RowChange chg = CompareRows(Table.Rows[r], Table.Rows[r - 1]);
 				if (chg != null)
 				{ yield return chg; }
 			}
 		}
 
 
-		private RowChg CompareRows(DataRow OldRow, DataRow NewRow)
+		private RowChange CompareRows(DataRow OldRow, DataRow NewRow)
 		{
-			RowChg rc = null;
+			RowChange rc = null;
 
 			foreach (DataColumn col in Cols)
 			{
@@ -254,7 +254,7 @@ namespace Strick.Temporal
 				{
 					if (rc == null)
 					{
-						rc = new RowChg(NewRow.Table.Rows.IndexOf(NewRow), (DateTime)NewRow[StartTimeColumn]);
+						rc = new RowChange(NewRow.Table.Rows.IndexOf(NewRow), (DateTime)NewRow[StartTimeColumn]);
 
 						if (EndTimeColumn != null)
 						{ rc.PeriodEndTime = (DateTime)NewRow[EndTimeColumn]; }
@@ -266,7 +266,7 @@ namespace Strick.Temporal
 						{ rc.Key = NewRow[KeyColumn]; }
 					}
 
-					rc.ColumnChanges.Add(new ColChg(NewRow.Table.Columns.IndexOf(col), col.ColumnName, OldRow[col], NewRow[col]));
+					rc.ColumnChanges.Add(new ColChange(NewRow.Table.Columns.IndexOf(col), col.ColumnName, OldRow[col], NewRow[col]));
 				}
 			}
 
