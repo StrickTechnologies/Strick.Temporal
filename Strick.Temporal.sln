@@ -5,7 +5,12 @@ VisualStudioVersion = 16.0.30204.135
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Strick.Temporal", "Strick.Temporal\Strick.Temporal.csproj", "{EF23982D-8A59-45CE-8812-D62DA7E32461}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Strick.Temporal.Test", "Strick.Temporal.Test\Strick.Temporal.Test.csproj", "{19F9EBC4-1DC9-4C16-9868-EFE360A95F90}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Strick.Temporal.Test", "Strick.Temporal.Test\Strick.Temporal.Test.csproj", "{19F9EBC4-1DC9-4C16-9868-EFE360A95F90}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{824C1D3B-943B-4826-ADC0-E89E882A34AF}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
