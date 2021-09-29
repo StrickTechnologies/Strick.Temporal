@@ -12,7 +12,7 @@ namespace Strick.Temporal.Test
 	{
 		static void Main(string[] args)
 		{
-			var tc = UnitTest1.EETest();
+			var tc = TemporalComparerTests.EETest();
 			ShowRC(tc);
 		}
 
