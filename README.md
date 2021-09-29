@@ -2,6 +2,8 @@
 Utilities for working with temporal data in .Net
 
 # ```TemporalComparer``` object
+The ```TemporalComparer``` object will find differences in temporal data. It works with a DataTable object containing temporal data.
+
 ## DataTable requirements
 * This will work on any DataTable that contains temporal data – it doesn’t have to come specifically from a system versioned (temporal) table.
 
@@ -30,17 +32,27 @@ Utilities for working with temporal data in .Net
 
 * Optional.  By default, it will compare ALL columns in the DataTable (aside from those designated by the ```StartTimeColumn```, ```EndTimeColumn```, ```UserIDColumn``` and ```KeyColumn``` properties).  You can override that behavior and compare only a subset of the columns in the DataTable by using either the ```IncludedColumns``` or ```ExcludedColumns``` properties.  Add columns to the ```IncludedColumns``` collection, and only those columns will be compared and included in the results.  Add columns to the ```ExcludedColumns``` Collection, and it will compare ALL columns except those (and the "special" columns noted above).  **If both ```IncludedColumns``` and ```ExcludedColumns``` have columns in them, ```IncludedColumns``` will take precedent, and ```ExcludedColumns``` will be ignored.**
 
-	* **!** You can also accomplish this by by including only the columns you want to compare in the SQL query when you create your DataTable.
+	* **!** You can also accomplish this by by including only the columns you want to compare in the SQL query when you create your DataTable. Obviously, in that case no other data will be in the DataTable. If there are other fields you might wish to display, use one of the methods outlined above.
 
-* The ```Changes``` property will return an ```IEnumerable<RowChange>``` containing the differences it finds.  **Note that Changes runs the comparison each time it’s called.  The results are *NOT* cached in the TemporalComparer object.**  This could take significant time on a large DataTable.  If your code needs to call ```Changes``` multiple times, you should store the results from the first call (e.g. ```List<RowChange> MyChanges = comparer.Changes.ToList()``` ) and then use that variable to subsequently access the results.
 
 ## Results
 
+Use the ```Changes``` property to retrieve an ```IEnumerable<RowChange>``` containing the differences found in the DataTable. Accessing the ```Changes``` property invokes the ```TemporalComparer``` object's scan of the DataTable.
+
+**Note that the ```Changes``` property runs the scan each time it is accessed.  The results are *NOT* cached in the ```TemporalComparer``` object.**
+
+This could take significant time on a large DataTable.  If your code needs to access ```Changes``` multiple times, you should store the results, e.g.:
+```
+  List<RowChange> MyChanges = comparer.Changes.ToList();
+```
+Then use that variable to subsequently access the results.
+
+### Other Details...
 * Each ```RowChange``` object is guaranteed to have at least one ```ColChange``` object in its ```ColumnChanges``` property.
 
 	* If two rows in your DataTable don’t have any changes (this can certainly happen if you’re only looking at a subset of the columns), no ```RowChange``` object is returned for those two rows.
 
-* The results are sorted oldest->newest.
+* The results are sorted chronologically, oldest->newest.
  
 Here’s the Q&D I’ve been using to test with:
 ```
