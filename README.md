@@ -50,7 +50,7 @@ Then use that variable to subsequently access the results.
 ### Other Details...
 * Each ```RowChange``` object is guaranteed to have at least one ```ColChange``` object in its ```ColumnChanges``` property.
 
-	* If two rows in your DataTable don’t have any changes (this can certainly happen if you’re only looking at a subset of the columns), no ```RowChange``` object is returned for those two rows.
+	* If two related rows in your DataTable don’t have any differences (this can happen if you’re only looking at a subset of the columns), no ```RowChange``` object is returned for those two rows.
 
 * The results are sorted chronologically, oldest->newest.
  
