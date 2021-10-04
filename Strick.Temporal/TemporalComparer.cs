@@ -8,10 +8,10 @@ using System.Text;
 namespace Strick.Temporal
 {
 	/// <summary>
-	/// Iterates related rows in a DataTable (e.g. from a temporal table) and returns a sequence containing information about the changes between related rows.  
-	/// Use the KeyColumn property to indicate which column is the key that designates "related" rows.  All rows with the same Key are considered "related".  
-	/// If KeyColumn is null (the default), ALL rows in the DataTable are assumed to be related.  
-	/// Rows in the DataTable are assumed to be ordered newest to oldest (descending on SysStartTime)
+	/// </para>Iterates related rows in a DataTable (e.g. from a system versioned/temporal table) and returns a sequence containing information about the changes between related rows.</para>
+	/// <para>Use the KeyColumn property to indicate which column is the key that designates "related" rows.  All rows with the same Key are considered "related".</para>
+	/// <para>If KeyColumn is null (the default), ALL rows in the DataTable are assumed to be related.</para>
+	/// <para>Rows in the DataTable are assumed to be ordered descending on SysStartTime (newest to oldest).</para>
 	/// </summary>
 	public class TemporalComparer
 	{
@@ -211,9 +211,11 @@ namespace Strick.Temporal
 
 
 		/// <summary>
-		/// Returns an IEnumerable<RowChg> containing information about the changes between related rows in the DataTable.  
-		/// ** The returned sequence of changes is NOT cached -- the comparison is run each time this property is accessed.  
-		/// If you need to access the returned changes multiple times, cache the returned value (e.g. IEnumerable<RowChg> MyChanges = myTemporalComparer.Changes;) **
+		/// <para>Returns an <see cref="IEnumerable{}"/> of type <see cref="RowChange"/> containing information about the changes between related rows in the DataTable.</para>
+		/// <para><b>** The returned sequence of changes is NOT cached -- the comparison is run each time this property is accessed.</b>  
+		/// If you need to access the returned changes multiple times, cache the returned value, for example: 
+		/// <code>IEnumerable&lt;RowChg&gt; MyChanges = myTemporalComparer.Changes;</code>
+		/// </para>
 		/// </summary>
 		public IEnumerable<RowChange> Changes => GetChanges();
 
