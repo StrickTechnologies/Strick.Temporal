@@ -65,7 +65,7 @@ namespace Strick.Temporal.Test
 
 			rc = rowChanges[2];
 			rc.CheckRowChange(5, 2, 2);
-			rc.ColumnChanges[0].CheckColChange(2, jtHTech, jtHSuper);
+			rc.ColumnChanges[0].CheckColChange(2, Employee.jobTitleHTech, Employee.jobTitleHSuper);
 			rc.ColumnChanges[1].CheckColChange(3, 23.86m, 26.25m);
 
 			rc = rowChanges[3];
@@ -74,7 +74,7 @@ namespace Strick.Temporal.Test
 
 			rc = rowChanges[4];
 			rc.CheckRowChange(2, 2, 1);
-			rc.ColumnChanges[0].CheckColChange(2, jtHTech, jtHSuper);
+			rc.ColumnChanges[0].CheckColChange(2, Employee.jobTitleHTech, Employee.jobTitleHSuper);
 			rc.ColumnChanges[1].CheckColChange(3, 23.23m, 25.55m);
 
 			rc = rowChanges[5];
@@ -136,11 +136,11 @@ namespace Strick.Temporal.Test
 
 			var rc = rowChanges[0];
 			rc.CheckRowChange(5, 1, 2);
-			rc.ColumnChanges[0].CheckColChange(2, jtHTech, jtHSuper);
+			rc.ColumnChanges[0].CheckColChange(2, Employee.jobTitleHTech, Employee.jobTitleHSuper);
 
 			rc = rowChanges[1];
 			rc.CheckRowChange(2, 1, 1);
-			rc.ColumnChanges[0].CheckColChange(2, jtHTech, jtHSuper);
+			rc.ColumnChanges[0].CheckColChange(2, Employee.jobTitleHTech, Employee.jobTitleHSuper);
 		}
 
 		//Terminations
@@ -179,7 +179,7 @@ namespace Strick.Temporal.Test
 
 			rc = rowChanges[2];
 			rc.CheckRowChange(5, 2, 2);
-			rc.ColumnChanges[0].CheckColChange(2, jtHTech, jtHSuper);
+			rc.ColumnChanges[0].CheckColChange(2, Employee.jobTitleHTech, Employee.jobTitleHSuper);
 			rc.ColumnChanges[1].CheckColChange(3, 23.86m, 26.25m);
 
 			rc = rowChanges[3];
@@ -188,7 +188,7 @@ namespace Strick.Temporal.Test
 
 			rc = rowChanges[4];
 			rc.CheckRowChange(2, 2, 1);
-			rc.ColumnChanges[0].CheckColChange(2, jtHTech, jtHSuper);
+			rc.ColumnChanges[0].CheckColChange(2, Employee.jobTitleHTech, Employee.jobTitleHSuper);
 			rc.ColumnChanges[1].CheckColChange(3, 23.23m, 25.55m);
 
 			rc = rowChanges[5];
@@ -209,23 +209,17 @@ namespace Strick.Temporal.Test
 
 			var rc = rowChanges[0];
 			rc.CheckRowChange(5, 1, 2);
-			rc.ColumnChanges[0].CheckColChange(2, jtHTech, jtHSuper);
+			rc.ColumnChanges[0].CheckColChange(2, Employee.jobTitleHTech, Employee.jobTitleHSuper);
 
 			rc = rowChanges[1];
 			rc.CheckRowChange(2, 1, 1);
-			rc.ColumnChanges[0].CheckColChange(2, jtHTech, jtHSuper);
+			rc.ColumnChanges[0].CheckColChange(2, Employee.jobTitleHTech, Employee.jobTitleHSuper);
 
 			rc = rowChanges[2];
 			rc.CheckRowChange(0, 2, 1);
 			rc.ColumnChanges[0].CheckColChange(5, DBNull.Value, new DateTime(2017, 5, 31));
 			rc.ColumnChanges[1].CheckColChange(6, DBNull.Value, "Left for another job");
 		}
-
-
-		private const string jtHTech = "Helpdesk Tech";
-
-		private const string jtHSuper = "Helpdesk Supervisor";
-
 
 		public static TemporalComparer EETest()
 		{
@@ -250,10 +244,10 @@ namespace Strick.Temporal.Test
 				//build a datatable to simulate temporal data (no db or connection required)
 
 				//Build a simple DataTable
-				tbl = EEDataTable();
+				tbl = EmployeeTestData.getDataTable();
 
 				//Add some simulated temporal data to the table
-				EEData(tbl);
+				EmployeeTestData.EEData(tbl);
 
 				//sort into the proper order...
 				tbl.DefaultView.Sort = "ID, SysEndTime desc";
@@ -266,139 +260,6 @@ namespace Strick.Temporal.Test
 			tc.KeyColumn = tbl.Columns["ID"];
 			tc.UserIDColumn = tbl.Columns["ChangedBy"];
 			return tc;
-		}
-
-
-		private static void EEData(DataTable tbl)
-		{
-			EEDataMary(tbl);
-			EEDataJoe(tbl);
-		}
-
-		private static void EEDataMary(DataTable tbl)
-		{
-			DateTime start;
-			DateTime end;
-
-			//Mary is hired
-			start = new DateTime(2015, 3, 1, 8, 1, 23);
-			var Mary = new EE(1, "Mary Martin", jtHTech, (decimal)22.12, start.Date);
-			end = new DateTime(2016, 2, 28, 14, 15, 47);
-			AddEERow(tbl, Mary, start, end, "Jack");
-
-			//Mary gets a raise at her 1-year anniversary
-			Mary.Raise(5);
-			start = end;
-			end = new DateTime(2016, 10, 31, 10, 34, 56);
-			AddEERow(tbl, Mary, start, end, "Jack");
-
-			//Mary gets a promotion and raise
-			Mary.Promote(jtHSuper, 10);
-			start = end;
-			end = new DateTime(2017, 2, 28, 13, 04, 47);
-			AddEERow(tbl, Mary, start, end, "Jack");
-
-			//Mary gets a raise at her 2-year anniversary
-			Mary.Raise(5);
-			start = end;
-			end = new DateTime(2017, 5, 31, 17, 32, 24);
-			AddEERow(tbl, Mary, start, end, "Jill");
-
-			//Mary leaves for another job
-			Mary.Terminate(end.Date, "Left for another job");
-			start = end;
-			end = new DateTime(9999, 12, 31, 23, 59, 59, 999);
-			AddEERow(tbl, Mary, start, end, "Jack");
-
-		}
-
-		private static void EEDataJoe(DataTable tbl)
-		{
-			DateTime start;
-			DateTime end;
-
-			//Joe is hired
-			start = new DateTime(2015, 4, 1, 8, 42, 16);
-			var Joe = new EE(2, "Joe Jones", jtHTech, (decimal)21.64, start.Date);
-			end = new DateTime(2016, 3, 31, 16, 35, 17);
-			AddEERow(tbl, Joe, start, end, "Jill");
-
-			//Joe gets a raise at his 1-year anniversary
-			Joe.Raise(5);
-			start = end;
-			end = new DateTime(2017, 3, 31, 13, 49, 36);
-			AddEERow(tbl, Joe, start, end, "Jack");
-
-			//Joe gets a raise at his 2-year anniversary
-			Joe.Raise(5);
-			start = end;
-			end = new DateTime(2017, 6, 3, 9, 1, 6);
-			AddEERow(tbl, Joe, start, end, "Jill");
-
-			//Joe gets a promotion and raise
-			Joe.Promote(jtHSuper, 10);
-			start = end;
-			end = new DateTime(9999, 12, 31, 23, 59, 59, 999);
-			AddEERow(tbl, Joe, start, end, "Jack");
-		}
-
-		private static DataTable EEDataTable()
-		{
-			//Build a simple Employee DataTable
-			DataTable t = new DataTable("Employees");
-			t.Columns.Add("ID", typeof(int));
-			t.Columns.Add("Name", typeof(string));
-			t.Columns.Add("JobTitle", typeof(string));
-			t.Columns.Add("Salary", typeof(decimal));
-			t.Columns.Add("HireDate", typeof(DateTime));
-			t.Columns.Add("TerminationDate", typeof(DateTime));
-			t.Columns.Add("TerminationReason", typeof(string));
-			t.Columns.Add("SysStartTime", typeof(DateTime));
-			t.Columns.Add("SysEndTime", typeof(DateTime));
-			t.Columns.Add("ChangedBy", typeof(string));
-
-			return t;
-		}
-
-		private static void AddEERow(DataTable tbl, EE emp, DateTime SysStartTime, DateTime SysEndTime, string changedBy) => AddEERow(tbl, emp.ID, emp.Name, emp.JobTitle, emp.Salary, emp.HireDate, emp.TerinationDate, emp.TerminationReason, SysStartTime, SysEndTime, changedBy);
-
-		private static void AddEERow(DataTable tbl, int ID, string Name, string JobTitle, decimal Salary, DateTime Hire, DateTime? Termination, string TermReason, DateTime SysStartTime, DateTime SysEndTime, string changedBy)
-		{ tbl.Rows.Add(ID, Name, JobTitle, Salary, Hire, Termination, TermReason, SysStartTime, SysEndTime, changedBy); }
-
-
-		private class EE
-		{
-			public EE(int id, string name, string jobTitle, decimal salary, DateTime hire) => (ID, Name, JobTitle, Salary, HireDate) = (id, name, jobTitle, salary, hire);
-
-			public int ID { get; set; }
-			public string Name { get; set; }
-			public string JobTitle { get; set; }
-			public decimal Salary { get; set; }
-			public DateTime HireDate { get; set; }
-			public DateTime? TerinationDate { get; set; } = null;
-			public string TerminationReason { get; set; }
-
-			public void Raise(decimal IncreasePercentage) => Salary = CalcSalIncrease(Salary, IncreasePercentage);
-
-			public void Promote(string NewJobTitle, decimal IncreasePercentage) => (JobTitle, Salary) = (NewJobTitle, CalcSalIncrease(Salary, IncreasePercentage));
-
-			public void Terminate(DateTime TermDate, string TermReason) => (TerinationDate, TerminationReason) = (TermDate, TermReason);
-
-			private decimal CalcSalIncrease(decimal Sal, decimal Inc) => Math.Round(Salary * (1 + (Inc / 100)), 2, MidpointRounding.AwayFromZero);
-		}
-
-		private static DataTable SimpleDt()
-		{
-			//Build a simple DataTable
-			DataTable t = new DataTable("Simple");
-			t.Columns.Add("ID", typeof(int));
-			t.Columns.Add("Title", typeof(string));
-			t.Columns.Add("Amount", typeof(decimal));
-			t.Columns.Add("Date", typeof(DateTime));
-			t.Columns.Add("SysStartTime", typeof(DateTime));
-			t.Columns.Add("SysEndTime", typeof(DateTime));
-
-			return t;
 		}
 	}
 }

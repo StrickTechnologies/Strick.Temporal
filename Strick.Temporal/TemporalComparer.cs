@@ -50,6 +50,9 @@ namespace Strick.Temporal
 
 			if (Table.Columns[EndTimeColName] != null && Table.Columns[EndTimeColName].DataType == typeof(System.DateTime))
 			{ EndTimeColumn = Table.Columns[EndTimeColName]; }
+
+			IncludedColumns = new TemporalComparerColumnList(this);
+			ExcludedColumns = new TemporalComparerColumnList(this);
 		}
 
 
@@ -156,7 +159,7 @@ namespace Strick.Temporal
 		/// See also ExcludedColumns property.
 		/// If BOTH IncludedColumns and ExcludedColumns have specified columns, IncludedColumns takes precedent, and ExcludedColumns is ignored.
 		/// </summary>
-		public List<DataColumn> IncludedColumns { get; } = new List<DataColumn>();
+		public TemporalComparerColumnList IncludedColumns { get; }
 
 
 		/// <summary>
@@ -164,7 +167,7 @@ namespace Strick.Temporal
 		/// See also IncludedColumns property.
 		/// If BOTH IncludedColumns and ExcludedColumns have specified columns, IncludedColumns takes precedent, and ExcludedColumns is ignored.
 		/// </summary>
-		public List<DataColumn> ExcludedColumns { get; } = new List<DataColumn>();
+		public TemporalComparerColumnList ExcludedColumns { get; }
 
 
 		protected IEnumerable<DataColumn> Cols;
@@ -281,7 +284,7 @@ namespace Strick.Temporal
 		/// If the Throw argument is true, throws an exception if Col is null or does not belong to Table.
 		/// If the Throw argument is false, returns true if Col is not null and belongs to Table, and returns false if either condition is not met.
 		/// </summary>
-		protected bool IsValidCol(DataColumn Col, bool Throw)
+		internal bool IsValidCol(DataColumn Col, bool Throw)
 		{
 			if (Col == null)
 			{
