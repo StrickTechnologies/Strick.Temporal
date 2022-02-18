@@ -54,7 +54,7 @@ Then use that variable to subsequently access the results.
 
 * The results are sorted chronologically, oldest->newest.
 
-### Example
+## Example
 This sample works with the DataTable created in the unit tests for the project. **Note:** the ```ShowRC``` function is generic, and will work with any DataTable.
 ```
 TemporalComparer tc = new TemporalComparer(MyDataTable);
