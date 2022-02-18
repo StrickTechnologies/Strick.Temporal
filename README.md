@@ -84,6 +84,10 @@ private static void ShowRC(TemporalComparer tc)
 		wl("");
 	}
 }
+
+
+public static void w(string message) => Console.Write(message);
+public static void wl(string message) => Console.WriteLine(message);
 ```
 
 The above sample code returns results (for the DataTable created in the unit tests for the project) that look like this:
