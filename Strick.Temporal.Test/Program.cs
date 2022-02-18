@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -12,7 +13,12 @@ namespace Strick.Temporal.Test
 	{
 		static void Main(string[] args)
 		{
-			var tc = TemporalComparerTests.EETest();
+			//var tc = TemporalComparerTests.EETest();
+			//ShowRC(tc);
+
+			using var tbl = GetDT("Company", "id");
+			TemporalComparer tc = new(tbl);
+			tc.KeyColumn = tbl.Columns["id"];
 			ShowRC(tc);
 		}
 
@@ -103,6 +109,23 @@ namespace Strick.Temporal.Test
 			}
 			//t1.WriteXml(Path.Combine(Path.GetDirectoryName(fname), "Copy of Temporal Test.dt"));
 			return t1;
+		}
+
+		private static DataTable GetDT(string tblName, string key)
+		{
+			using SqlConnection conn = GetConn();
+			using SqlCommand cmd = new($"SELECT *, SysStartTime, SysEndTime FROM {tblName} for system_time all order by {key}, SysEndTime desc", conn);
+			using SqlDataAdapter da = new(cmd);
+
+			DataTable tbl = new();
+			da.Fill(tbl);
+
+			return tbl;
+		}
+
+		private static SqlConnection GetConn()
+		{
+			return new SqlConnection("Server=(localdb)\\Temporal; Integrated Security=True; Database=ParDb");
 		}
 
 		private static void PrintSt(DataTable dt)

@@ -34,6 +34,16 @@ The ```TemporalComparer``` object will find differences in temporal data. It wor
 
 	* **!** You can also accomplish this by by including only the columns you want to compare in the SQL query when you create your DataTable. Obviously, in that case no other data will be in the DataTable. If there are other fields you might wish to display or you cannot change the columns in your DataTable, use one of the methods outlined above.
 
+* You can do different comparisons on the same data simply by changing either the ```IncludedColumns``` or ```ExcludedColumns``` properties and accessing the ```Changes``` property again. For example:
+
+	```
+	TemporalComparer tc = new(myTable);
+	tc.IncludedColumns.Add(myTable.Columns["someColName"]);
+	var someColChanges = tc.Changes; //changes only for column "someColName"
+	tc.IncludedColumns.Clear();
+	tc.IncludedColumns.Add(myTable.Columns["otherColName"]);
+	var otherColChanges = tc.Changes; //changes only for column "otherColName"
+	```
 
 ## Results
 
