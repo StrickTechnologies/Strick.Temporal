@@ -16,10 +16,10 @@ namespace Strick.Temporal.Test
 			//var tc = TemporalComparerTests.EETest();
 			//ShowRC(tc);
 
-			using var tbl = GetDT("Company", "id");
-			TemporalComparer tc = new(tbl);
-			tc.KeyColumn = tbl.Columns["id"];
-			ShowRC(tc);
+			//TestTable("Person", "id"); too long!
+			ShowTableDiffs("Company", "id");
+			wl("");
+			ShowTableDiffs("PersonEmailAssn", "personid");
 		}
 
 		private static void Test1()
@@ -62,6 +62,19 @@ namespace Strick.Temporal.Test
 			//PrintSt(dt);
 
 			TemporalComparer tc = new TemporalComparer(dt);
+			ShowRC(tc);
+		}
+
+		private static void ShowTableDiffs(string tblName, string keyColumn)
+		{
+			using var tbl = GetDT(tblName, keyColumn);
+
+			TemporalComparer tc = new(tbl);
+
+			if (!string.IsNullOrWhiteSpace(keyColumn))
+			{ tc.KeyColumn = tbl.Columns[keyColumn]; }
+
+			wl($"*** CHANGES IN {tblName} TABLE ***");
 			ShowRC(tc);
 		}
 
@@ -113,8 +126,11 @@ namespace Strick.Temporal.Test
 
 		private static DataTable GetDT(string tblName, string key)
 		{
+			if (!string.IsNullOrWhiteSpace(key))
+			{ key += ","; }
+			string order = $"order by {key}SysEndTime desc";
 			using SqlConnection conn = GetConn();
-			using SqlCommand cmd = new($"SELECT *, SysStartTime, SysEndTime FROM {tblName} for system_time all order by {key}, SysEndTime desc", conn);
+			using SqlCommand cmd = new($"SELECT *, SysStartTime, SysEndTime FROM {tblName} for system_time all {order}", conn);
 			using SqlDataAdapter da = new(cmd);
 
 			DataTable tbl = new();
