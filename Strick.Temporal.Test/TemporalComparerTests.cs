@@ -28,6 +28,7 @@ namespace Strick.Temporal.Test
 
 			EE_AllChanges(tc);
 			EE_SalaryChanges(tc);
+			EE_NoSalaryChanges(tc);
 			EE_JobTitleChanges(tc);
 			EE_TerminationChanges(tc);
 			EE_NoTerminationChanges(tc);
