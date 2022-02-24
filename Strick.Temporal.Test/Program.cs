@@ -16,10 +16,13 @@ namespace Strick.Temporal.Test
 			//var tc = TemporalComparerTests.EETest();
 			//ShowRC(tc);
 
-			//TestTable("Person", "id"); too long!
 			ShowTableDiffs("Company", "id");
 			wl("");
 			ShowTableDiffs("PersonEmailAssn", "personid");
+			ShowTableDiffs("PersonEmailAssn", "personid", "personid not in(25273,25207)"); //skip the IDs that have multiple "current" records
+
+			wl("");
+			ShowTableDiffs("Person", "id", "id in(264)");
 		}
 
 		private static void Test1()
@@ -65,9 +68,10 @@ namespace Strick.Temporal.Test
 			ShowRC(tc);
 		}
 
-		private static void ShowTableDiffs(string tblName, string keyColumn)
+		private static void ShowTableDiffs(string tblName, string keyColumn) => ShowTableDiffs(tblName, keyColumn, null);
+		private static void ShowTableDiffs(string tblName, string keyColumn, string rowFilter)
 		{
-			using var tbl = GetDT(tblName, keyColumn);
+			using var tbl = GetDT(tblName, keyColumn, rowFilter);
 
 			TemporalComparer tc = new(tbl);
 
@@ -75,6 +79,9 @@ namespace Strick.Temporal.Test
 			{ tc.KeyColumn = tbl.Columns[keyColumn]; }
 
 			wl($"*** CHANGES IN {tblName} TABLE ***");
+			if (!string.IsNullOrWhiteSpace(rowFilter))
+			{ wl($"\tfilter is \"{rowFilter}\""); }
+
 			ShowRC(tc);
 		}
 
@@ -124,13 +131,14 @@ namespace Strick.Temporal.Test
 			return t1;
 		}
 
-		private static DataTable GetDT(string tblName, string key)
+		private static DataTable GetDT(string tblName, string key, string rowFilter)
 		{
 			if (!string.IsNullOrWhiteSpace(key))
 			{ key += ","; }
 			string order = $"order by {key}SysEndTime desc";
+			string where = !string.IsNullOrWhiteSpace(rowFilter) ? $"where {rowFilter}" : "";
 			using SqlConnection conn = GetConn();
-			using SqlCommand cmd = new($"SELECT *, SysStartTime, SysEndTime FROM {tblName} for system_time all {order}", conn);
+			using SqlCommand cmd = new($"SELECT *, SysStartTime, SysEndTime FROM {tblName} for system_time all {where} {order}", conn);
 			using SqlDataAdapter da = new(cmd);
 
 			DataTable tbl = new();
