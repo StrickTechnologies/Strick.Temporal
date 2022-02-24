@@ -49,5 +49,14 @@ namespace Strick.Temporal
 		IEnumerator IEnumerable.GetEnumerator() => columns.GetEnumerator();
 
 		#endregion ICOLLECTION Interface
+
+
+		public void AddRange(IEnumerable<string> columnNames)
+		{
+			foreach(string cNm in columnNames)
+			{
+				Add(comparer.Table.Columns[cNm]);
+			}
+		}
 	}
 }

@@ -53,6 +53,7 @@ namespace Strick.Temporal
 
 			IncludedColumns = new TemporalComparerColumnList(this);
 			ExcludedColumns = new TemporalComparerColumnList(this);
+			KeyColumns = new TemporalComparerColumnList(this);
 		}
 
 
@@ -125,32 +126,21 @@ namespace Strick.Temporal
 		public bool HasUserIDColumn => UserIDColumn != null;
 
 
-		protected DataColumn kcol;
-
 		/// <summary>
 		/// Indicates which column is the key that designates "related" rows.  All rows with the same Key are considered "related".  
 		/// Only related rows will be compared to one another.  
 		/// If null (the default), ALL rows in the DataTable are assumed to be related.
 		/// ** Multi-column keys are not supported at this time. **
 		/// </summary>
-		public DataColumn KeyColumn
-		{
-			get => kcol;
+		public TemporalComparerColumnList KeyColumns { get; }
 
-			set
-			{
-				if (value == null || IsValidCol(value, true))
-				{ kcol = value; }
-			}
-		}
+		public bool HasKey => KeyColumns != null && KeyColumns.Count > 0;
 
 		/// <summary>
 		/// Gets/sets a value which indicates whether or not to include the column designated by KeyColumn in the comparison.  
 		/// Default is false.  Ignored if KeyColumn is null.
 		/// </summary>
 		public bool IncludeKeyColumn { get; set; } = false;
-
-		public bool HasKeyColumn => KeyColumn != null;
 
 
 		/// <summary>
@@ -205,8 +195,9 @@ namespace Strick.Temporal
 			if (Col == EndTimeColumn)
 			{ return IncludeEndTimeColumn; }
 
-			if (Col == KeyColumn)
-			{ return IncludeKeyColumn; }
+			//todo: what to do about this???
+			//if (Col == KeyColumns)
+			//{ return IncludeKeyColumn; }
 
 
 			return Default;
@@ -233,10 +224,10 @@ namespace Strick.Temporal
 			//assumes rows ordered newest to oldest...
 			for (int r = Table.Rows.Count - 1; r > 0; r--)
 			{
-				if (HasKeyColumn)
+				if (HasKey)
 				{
 					//when key changes, find next two matching rows
-					while (r > 0 && !Table.Rows[r][KeyColumn].Equals(Table.Rows[r - 1][KeyColumn]))
+					while (r > 0 && !KeysEqual(Table.Rows[r], Table.Rows[r - 1]))
 					{ r--; }
 					if (r == 0)
 					{ break; }
@@ -267,8 +258,9 @@ namespace Strick.Temporal
 						if (UserIDColumn != null)
 						{ rc.UserID = NewRow[UserIDColumn]; }
 
-						if (KeyColumn != null)
-						{ rc.Key = NewRow[KeyColumn]; }
+						//todo:do we need this???
+						//if (KeyColumns != null)
+						//{ rc.Key = NewRow[KeyColumns]; }
 					}
 
 					rc.ColumnChanges.Add(new ColChange(NewRow.Table.Columns.IndexOf(col), col.ColumnName, OldRow[col], NewRow[col]));
@@ -276,6 +268,21 @@ namespace Strick.Temporal
 			}
 
 			return rc;
+		}
+
+		private bool KeysEqual(DataRow OldRow, DataRow NewRow)
+		{
+			//should NOT get here in this case, so just a failsafe...
+			if(!HasKey)
+			{ return true; }
+
+			foreach(DataColumn col in KeyColumns)
+			{
+				if (!NewRow[col.Ordinal].Equals(OldRow[col.Ordinal]))
+				{ return false; }
+			}
+
+			return true;
 		}
 
 

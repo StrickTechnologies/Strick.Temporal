@@ -258,7 +258,7 @@ namespace Strick.Temporal.Test
 
 			//find the changes
 			TemporalComparer tc = new TemporalComparer(tbl);
-			tc.KeyColumn = tbl.Columns["ID"];
+			tc.KeyColumns.Add(tbl.Columns["ID"]);
 			tc.UserIDColumn = tbl.Columns["ChangedBy"];
 			return tc;
 		}

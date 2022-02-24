@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -16,13 +17,13 @@ namespace Strick.Temporal.Test
 			//var tc = TemporalComparerTests.EETest();
 			//ShowRC(tc);
 
-			ShowTableDiffs("Company", "id");
+			ShowTableDiffs("Company", new[] { "id" });
 			wl("");
-			ShowTableDiffs("PersonEmailAssn", "personid");
-			ShowTableDiffs("PersonEmailAssn", "personid", "personid not in(25273,25207)"); //skip the IDs that have multiple "current" records
+			ShowTableDiffs("PersonEmailAssn", new[] { "personid", "emailid" });
+			ShowTableDiffs("PersonEmailAssn", new[] { "personid" }, "personid not in(25273,25207)"); //skip the IDs that have multiple "current" records
 
 			wl("");
-			ShowTableDiffs("Person", "id", "id in(264)");
+			ShowTableDiffs("Person", new[] { "id" }, "id in(264)");
 		}
 
 		private static void Test1()
@@ -43,7 +44,7 @@ namespace Strick.Temporal.Test
 
 
 			TemporalComparer tc = new TemporalComparer(t1);
-			tc.KeyColumn = t1.Columns["ID"];
+			tc.KeyColumns.Add(t1.Columns["ID"]);
 			ShowRC(tc);
 		}
 
@@ -68,21 +69,52 @@ namespace Strick.Temporal.Test
 			ShowRC(tc);
 		}
 
-		private static void ShowTableDiffs(string tblName, string keyColumn) => ShowTableDiffs(tblName, keyColumn, null);
-		private static void ShowTableDiffs(string tblName, string keyColumn, string rowFilter)
+		private static void ShowTableDiffs(string tblName, IEnumerable<string> keyColumns) => ShowTableDiffs(tblName, keyColumns, null);
+		private static void ShowTableDiffs(string tblName, IEnumerable<string> keyColumns, string rowFilter)
 		{
-			using var tbl = GetDT(tblName, keyColumn, rowFilter);
+			using var tbl = GetDT(tblName, keyColumns, rowFilter);
 
 			TemporalComparer tc = new(tbl);
 
-			if (!string.IsNullOrWhiteSpace(keyColumn))
-			{ tc.KeyColumn = tbl.Columns[keyColumn]; }
+			if (keyColumns != null && keyColumns.Count() > 0)
+			{ tc.KeyColumns.AddRange(keyColumns); }
 
 			wl($"*** CHANGES IN {tblName} TABLE ***");
 			if (!string.IsNullOrWhiteSpace(rowFilter))
 			{ wl($"\tfilter is \"{rowFilter}\""); }
 
 			ShowRC(tc);
+		}
+
+		private static DataTable GetDT(string tblName, IEnumerable<string> keyColumns, string rowFilter)
+		{
+			string where = !string.IsNullOrWhiteSpace(rowFilter) ? $"where {rowFilter}" : "";
+			string order;
+			if (keyColumns != null && keyColumns.Count() > 0)
+			{ order = $"order by {string.Join(",", keyColumns)},SysEndTime desc"; }
+			else
+			{ order = $"order by SysEndTime desc"; }
+
+			using SqlConnection conn = GetConn();
+			using SqlCommand cmd = new($"SELECT *, SysStartTime, SysEndTime FROM {tblName} for system_time all {where} {order}", conn);
+			using SqlDataAdapter da = new(cmd);
+
+			DataTable tbl = new();
+			da.Fill(tbl);
+
+			return tbl;
+		}
+
+		private static SqlConnection GetConn()
+		{
+			return new SqlConnection("Server=(localdb)\\Temporal; Integrated Security=True; Database=ParDb");
+		}
+
+
+		private static void PrintSt(DataTable dt)
+		{
+			foreach (DataRow r in dt.Rows)
+			{ wl($"{r["SysStartTime"]}"); }
 		}
 
 		private static DataTable CreateDT()
@@ -131,32 +163,6 @@ namespace Strick.Temporal.Test
 			return t1;
 		}
 
-		private static DataTable GetDT(string tblName, string key, string rowFilter)
-		{
-			if (!string.IsNullOrWhiteSpace(key))
-			{ key += ","; }
-			string order = $"order by {key}SysEndTime desc";
-			string where = !string.IsNullOrWhiteSpace(rowFilter) ? $"where {rowFilter}" : "";
-			using SqlConnection conn = GetConn();
-			using SqlCommand cmd = new($"SELECT *, SysStartTime, SysEndTime FROM {tblName} for system_time all {where} {order}", conn);
-			using SqlDataAdapter da = new(cmd);
-
-			DataTable tbl = new();
-			da.Fill(tbl);
-
-			return tbl;
-		}
-
-		private static SqlConnection GetConn()
-		{
-			return new SqlConnection("Server=(localdb)\\Temporal; Integrated Security=True; Database=ParDb");
-		}
-
-		private static void PrintSt(DataTable dt)
-		{
-			foreach (DataRow r in dt.Rows)
-			{ wl($"{r["SysStartTime"]}"); }
-		}
 
 
 		private static void ShowRC(TemporalComparer tc)
@@ -164,8 +170,10 @@ namespace Strick.Temporal.Test
 			foreach (RowChange rc in tc.Changes)
 			{
 				w($"* Row Change: Index:{rc.RowIndex} At:{rc.ChangeTime}");
-				if (tc.HasKeyColumn)
-				{ w($" Key:{rc.Key} "); }
+
+				//todo: fix after TemporalComparer changes complete...
+				//if (tc.HasKeyColumn)
+				//{ w($" Key:{rc.Key} "); }
 
 				if (tc.HasUserIDColumn)
 				{ w($" by User ID:{rc.UserID} (row end time: {rc.PeriodEndTime})"); }
