@@ -2,7 +2,11 @@
 
   <PropertyGroup>
     <TargetFrameworks>net5.0;netcoreapp3.1;netstandard2.1;net472</TargetFrameworks>
-    <Copyright>Copyright (c) 2020 Strick Technologies, LLC. All rights reserved.</Copyright>
+    <Copyright>Copyright (c) 2020-2022 Strick Technologies, LLC. All rights reserved.</Copyright>
+    <Version>1.1.0</Version>
+    <Authors>Strick Technologies, LLC.; Jim Strickland</Authors>
+    <Company>Strick Technologies, LLC.</Company>
+    <Description>Utilities for working with temporal data in .Net</Description>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
