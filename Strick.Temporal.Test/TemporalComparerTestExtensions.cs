@@ -20,16 +20,15 @@ namespace Strick.Temporal.Test
 		/// <param name="changeTime"></param>
 		/// <param name="periodEndTime"></param>
 		/// <param name="userID">If NOT null, checks the passed value against the UserID property of rowChange. Pass DBNull.Value to check for a null value in the UserID property that comes from the datatable. If null, userID is not tested. Default is null.</param>
-		public static void CheckRowChange(this RowChange rowChange, int rowIndex, int colChangeCount = 1, object key = null, DateTime? changeTime = null, DateTime? periodEndTime = null, object userID = null)
+		public static void CheckRowChange(this RowChange rowChange, int rowIndex, int colChangeCount = 1, IEnumerable<object> key = null, DateTime? changeTime = null, DateTime? periodEndTime = null, object userID = null)
 		{
 			Assert.IsNotNull(rowChange);
 
 			Assert.AreEqual(rowIndex, rowChange.RowIndex);
 			Assert.AreEqual(colChangeCount, rowChange.ColumnChanges.Count);
 
-			//todo: fix after TemporalComparer changes complete...
-			//if (key != null)
-			//{ Assert.AreEqual(key, rowChange.Key); }
+			if (key != null)
+			{ Assert.IsTrue(key.SequenceEqual(rowChange.Key)); }
 
 			if (changeTime != null)
 			{ Assert.AreEqual(changeTime, rowChange.ChangeTime); }

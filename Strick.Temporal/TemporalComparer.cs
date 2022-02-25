@@ -136,11 +136,11 @@ namespace Strick.Temporal
 
 		public bool HasKey => KeyColumns != null && KeyColumns.Count > 0;
 
-		/// <summary>
-		/// Gets/sets a value which indicates whether or not to include the column designated by KeyColumn in the comparison.  
-		/// Default is false.  Ignored if KeyColumn is null.
-		/// </summary>
-		public bool IncludeKeyColumn { get; set; } = false;
+		///// <summary>
+		///// Gets/sets a value which indicates whether or not to include the column designated by KeyColumn in the comparison.  
+		///// Default is false.  Ignored if KeyColumn is null.
+		///// </summary>
+		//public bool IncludeKeyColumn { get; set; } = false;
 
 
 		/// <summary>
@@ -194,10 +194,6 @@ namespace Strick.Temporal
 
 			if (Col == EndTimeColumn)
 			{ return IncludeEndTimeColumn; }
-
-			//todo: what to do about this???
-			//if (Col == KeyColumns)
-			//{ return IncludeKeyColumn; }
 
 
 			return Default;
@@ -258,9 +254,8 @@ namespace Strick.Temporal
 						if (UserIDColumn != null)
 						{ rc.UserID = NewRow[UserIDColumn]; }
 
-						//todo:do we need this???
-						//if (KeyColumns != null)
-						//{ rc.Key = NewRow[KeyColumns]; }
+						if (HasKey)
+						{ rc.Key = getKeyValue(NewRow).ToList(); }
 					}
 
 					rc.ColumnChanges.Add(new ColChange(NewRow.Table.Columns.IndexOf(col), col.ColumnName, OldRow[col], NewRow[col]));
@@ -273,16 +268,22 @@ namespace Strick.Temporal
 		private bool KeysEqual(DataRow OldRow, DataRow NewRow)
 		{
 			//should NOT get here in this case, so just a failsafe...
-			if(!HasKey)
+			if (!HasKey)
 			{ return true; }
 
-			foreach(DataColumn col in KeyColumns)
+			foreach (DataColumn col in KeyColumns)
 			{
 				if (!NewRow[col.Ordinal].Equals(OldRow[col.Ordinal]))
 				{ return false; }
 			}
 
 			return true;
+		}
+
+		private IEnumerable<object> getKeyValue(DataRow row)
+		{
+			foreach (DataColumn col in KeyColumns)
+			{ yield return row[col]; }
 		}
 
 

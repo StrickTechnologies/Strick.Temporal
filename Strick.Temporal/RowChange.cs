@@ -25,7 +25,7 @@ namespace Strick.Temporal
 
 		public object UserID { get; set; }
 
-		public object Key { get; set; }
+		public List<object> Key { get; set; }
 
 		public List<ColChange> ColumnChanges { get; } = new List<ColChange>();
 	}

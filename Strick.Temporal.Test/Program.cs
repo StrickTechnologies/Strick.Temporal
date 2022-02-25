@@ -14,6 +14,8 @@ namespace Strick.Temporal.Test
 	{
 		static void Main(string[] args)
 		{
+			TestMKey();
+			return;
 			//var tc = TemporalComparerTests.EETest();
 			//ShowRC(tc);
 
@@ -68,6 +70,17 @@ namespace Strick.Temporal.Test
 			TemporalComparer tc = new TemporalComparer(dt);
 			ShowRC(tc);
 		}
+
+		private static void TestMKey()
+		{
+			var t = TemporalComparerKeyTests.getDT();
+			TemporalComparer tc = new(t);
+			tc.KeyColumns.Add(t.Columns["ID"]);
+			tc.KeyColumns.Add(t.Columns["PositionID"]);
+			tc.UserIDColumn = t.Columns["ChangedBy"];
+			ShowRC(tc);
+		}
+
 
 		private static void ShowTableDiffs(string tblName, IEnumerable<string> keyColumns) => ShowTableDiffs(tblName, keyColumns, null);
 		private static void ShowTableDiffs(string tblName, IEnumerable<string> keyColumns, string rowFilter)
@@ -165,18 +178,17 @@ namespace Strick.Temporal.Test
 
 
 
-		private static void ShowRC(TemporalComparer tc)
+		public static void ShowRC(TemporalComparer tc)
 		{
 			foreach (RowChange rc in tc.Changes)
 			{
 				w($"* Row Change: Index:{rc.RowIndex} At:{rc.ChangeTime}");
 
-				//todo: fix after TemporalComparer changes complete...
-				//if (tc.HasKeyColumn)
-				//{ w($" Key:{rc.Key} "); }
+				if (tc.HasKey)
+				{ w($" Key:{string.Join(".", rc.Key)} "); }
 
 				if (tc.HasUserIDColumn)
-				{ w($" by User ID:{rc.UserID} (row end time: {rc.PeriodEndTime})"); }
+				{ w($" by User ID:{rc.UserID}"); }
 
 				if (tc.HasEndTimeColumn)
 				{ w($" (row end time: {rc.PeriodEndTime})"); }

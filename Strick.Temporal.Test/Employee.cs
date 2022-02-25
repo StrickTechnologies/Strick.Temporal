@@ -15,6 +15,10 @@ namespace Strick.Temporal.Test
 
 		public const string jobTitleHSuper = "Helpdesk Supervisor";
 
+		public const string posIDHTech = "HTech";
+
+		public const string posIDHSuper = "HSuper";
+
 
 		public int ID { get; set; }
 		public string Name { get; set; }

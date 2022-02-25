@@ -42,5 +42,12 @@ namespace Strick.Temporal.Test
 			cols.Clear();
 			Assert.AreEqual(0, cols.Count);
 		}
+
+
+		[TestMethod]
+		public void AddRange()
+		{
+			//todo:write unit tests here...
+		}
 	}
 }

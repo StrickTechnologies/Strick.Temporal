@@ -57,33 +57,33 @@ namespace Strick.Temporal.Test
 
 			var rc = rowChanges[0];
 			//rc.CheckRowChange(7, 1, 2, new DateTime(2016, 3, 31, 16, 35, 17), new DateTime(2017, 3, 31, 13, 49, 36), "Jack");
-			rc.CheckRowChange(7, 1, 2);
+			rc.CheckRowChange(7, 1, new object[] { 2 });
 			rc.ColumnChanges[0].CheckColChange(3, 21.64m, 22.72m);
 
 			rc = rowChanges[1];
-			rc.CheckRowChange(6, 1, 2);
+			rc.CheckRowChange(6, 1, new object[] { 2 });
 			rc.ColumnChanges[0].CheckColChange(3, 22.72m, 23.86m);
 
 			rc = rowChanges[2];
-			rc.CheckRowChange(5, 2, 2);
+			rc.CheckRowChange(5, 2, new object[] { 2 });
 			rc.ColumnChanges[0].CheckColChange(2, Employee.jobTitleHTech, Employee.jobTitleHSuper);
 			rc.ColumnChanges[1].CheckColChange(3, 23.86m, 26.25m);
 
 			rc = rowChanges[3];
-			rc.CheckRowChange(3, 1, 1);
+			rc.CheckRowChange(3, 1, new object[] { 1 });
 			rc.ColumnChanges[0].CheckColChange(3, 22.12m, 23.23m);
 
 			rc = rowChanges[4];
-			rc.CheckRowChange(2, 2, 1);
+			rc.CheckRowChange(2, 2, new object[] { 1 });
 			rc.ColumnChanges[0].CheckColChange(2, Employee.jobTitleHTech, Employee.jobTitleHSuper);
 			rc.ColumnChanges[1].CheckColChange(3, 23.23m, 25.55m);
 
 			rc = rowChanges[5];
-			rc.CheckRowChange(1, 1, 1);
+			rc.CheckRowChange(1, 1, new object[] { 1 });
 			rc.ColumnChanges[0].CheckColChange(3, 25.55m, 26.83m);
 
 			rc = rowChanges[6];
-			rc.CheckRowChange(0, 2, 1);
+			rc.CheckRowChange(0, 2, new object[] { 1 });
 			rc.ColumnChanges[0].CheckColChange(5, DBNull.Value, new DateTime(2017, 5, 31));
 			rc.ColumnChanges[1].CheckColChange(6, DBNull.Value, "Left for another job");
 		}
@@ -100,27 +100,27 @@ namespace Strick.Temporal.Test
 			Assert.AreEqual(6, rowChanges.Count);
 
 			var rc = rowChanges[0];
-			rc.CheckRowChange(7, 1, 2);
+			rc.CheckRowChange(7, 1, new object[] { 2 });
 			rc.ColumnChanges[0].CheckColChange(3, 21.64m, 22.72m);
 
 			rc = rowChanges[1];
-			rc.CheckRowChange(6, 1, 2);
+			rc.CheckRowChange(6, 1, new object[] { 2 });
 			rc.ColumnChanges[0].CheckColChange(3, 22.72m, 23.86m);
 
 			rc = rowChanges[2];
-			rc.CheckRowChange(5, 1, 2);
+			rc.CheckRowChange(5, 1, new object[] { 2 });
 			rc.ColumnChanges[0].CheckColChange(3, 23.86m, 26.25m);
 
 			rc = rowChanges[3];
-			rc.CheckRowChange(3, 1, 1);
+			rc.CheckRowChange(3, 1, new object[] { 1 });
 			rc.ColumnChanges[0].CheckColChange(3, 22.12m, 23.23m);
 
 			rc = rowChanges[4];
-			rc.CheckRowChange(2, 1, 1);
+			rc.CheckRowChange(2, 1, new object[] { 1 });
 			rc.ColumnChanges[0].CheckColChange(3, 23.23m, 25.55m);
 
 			rc = rowChanges[5];
-			rc.CheckRowChange(1, 1, 1);
+			rc.CheckRowChange(1, 1, new object[] { 1 });
 			rc.ColumnChanges[0].CheckColChange(3, 25.55m, 26.83m);
 		}
 
@@ -136,11 +136,11 @@ namespace Strick.Temporal.Test
 			Assert.AreEqual(2, rowChanges.Count());
 
 			var rc = rowChanges[0];
-			rc.CheckRowChange(5, 1, 2);
+			rc.CheckRowChange(5, 1, new object[] { 2 });
 			rc.ColumnChanges[0].CheckColChange(2, Employee.jobTitleHTech, Employee.jobTitleHSuper);
 
 			rc = rowChanges[1];
-			rc.CheckRowChange(2, 1, 1);
+			rc.CheckRowChange(2, 1, new object[] { 1 });
 			rc.ColumnChanges[0].CheckColChange(2, Employee.jobTitleHTech, Employee.jobTitleHSuper);
 		}
 
@@ -171,29 +171,29 @@ namespace Strick.Temporal.Test
 
 			var rc = rowChanges[0];
 			//rc.CheckRowChange(7, 1, 2, new DateTime(2016, 3, 31, 16, 35, 17), new DateTime(2017, 3, 31, 13, 49, 36), "Jack");
-			rc.CheckRowChange(7, 1, 2);
+			rc.CheckRowChange(7, 1, new object[] { 2 });
 			rc.ColumnChanges[0].CheckColChange(3, 21.64m, 22.72m);
 
 			rc = rowChanges[1];
-			rc.CheckRowChange(6, 1, 2);
+			rc.CheckRowChange(6, 1, new object[] { 2 });
 			rc.ColumnChanges[0].CheckColChange(3, 22.72m, 23.86m);
 
 			rc = rowChanges[2];
-			rc.CheckRowChange(5, 2, 2);
+			rc.CheckRowChange(5, 2, new object[] { 2 });
 			rc.ColumnChanges[0].CheckColChange(2, Employee.jobTitleHTech, Employee.jobTitleHSuper);
 			rc.ColumnChanges[1].CheckColChange(3, 23.86m, 26.25m);
 
 			rc = rowChanges[3];
-			rc.CheckRowChange(3, 1, 1);
+			rc.CheckRowChange(3, 1, new object[] { 1 });
 			rc.ColumnChanges[0].CheckColChange(3, 22.12m, 23.23m);
 
 			rc = rowChanges[4];
-			rc.CheckRowChange(2, 2, 1);
+			rc.CheckRowChange(2, 2, new object[] { 1 });
 			rc.ColumnChanges[0].CheckColChange(2, Employee.jobTitleHTech, Employee.jobTitleHSuper);
 			rc.ColumnChanges[1].CheckColChange(3, 23.23m, 25.55m);
 
 			rc = rowChanges[5];
-			rc.CheckRowChange(1, 1, 1);
+			rc.CheckRowChange(1, 1, new object[] { 1 });
 			rc.ColumnChanges[0].CheckColChange(3, 25.55m, 26.83m);
 		}
 
@@ -209,15 +209,15 @@ namespace Strick.Temporal.Test
 			Assert.AreEqual(3, rowChanges.Count());
 
 			var rc = rowChanges[0];
-			rc.CheckRowChange(5, 1, 2);
+			rc.CheckRowChange(5, 1, new object[] { 2 });
 			rc.ColumnChanges[0].CheckColChange(2, Employee.jobTitleHTech, Employee.jobTitleHSuper);
 
 			rc = rowChanges[1];
-			rc.CheckRowChange(2, 1, 1);
+			rc.CheckRowChange(2, 1, new object[] { 1 });
 			rc.ColumnChanges[0].CheckColChange(2, Employee.jobTitleHTech, Employee.jobTitleHSuper);
 
 			rc = rowChanges[2];
-			rc.CheckRowChange(0, 2, 1);
+			rc.CheckRowChange(0, 2, new object[] { 1 });
 			rc.ColumnChanges[0].CheckColChange(5, DBNull.Value, new DateTime(2017, 5, 31));
 			rc.ColumnChanges[1].CheckColChange(6, DBNull.Value, "Left for another job");
 		}
