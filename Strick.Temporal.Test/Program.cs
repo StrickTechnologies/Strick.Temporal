@@ -14,18 +14,16 @@ namespace Strick.Temporal.Test
 	{
 		static void Main(string[] args)
 		{
-			TestMKey();
-			return;
 			//var tc = TemporalComparerTests.EETest();
 			//ShowRC(tc);
 
-			ShowTableDiffs("Company", new[] { "id" });
+			ShowTableDiffs("Company", "ModifiedUserId", new[] { "id" });
 			wl("");
-			ShowTableDiffs("PersonEmailAssn", new[] { "personid", "emailid" });
-			ShowTableDiffs("PersonEmailAssn", new[] { "personid" }, "personid not in(25273,25207)"); //skip the IDs that have multiple "current" records
+			ShowTableDiffs("PersonEmailAssn", null, new[] { "personid", "emailid" });
+			ShowTableDiffs("PersonEmailAssn", null, new[] { "personid" }, "personid not in(25273,25207)"); //skip the IDs that have multiple "current" records
 
 			wl("");
-			ShowTableDiffs("Person", new[] { "id" }, "id in(264)");
+			ShowTableDiffs("Person", "ModifiedUserId", new[] { "id" }, "id in(264)");
 		}
 
 		private static void Test1()
@@ -82,12 +80,16 @@ namespace Strick.Temporal.Test
 		}
 
 
-		private static void ShowTableDiffs(string tblName, IEnumerable<string> keyColumns) => ShowTableDiffs(tblName, keyColumns, null);
-		private static void ShowTableDiffs(string tblName, IEnumerable<string> keyColumns, string rowFilter)
+		private static void ShowTableDiffs(string tblName, string UserIDColName, IEnumerable<string> keyColumns) => ShowTableDiffs(tblName, UserIDColName, keyColumns, null);
+
+		private static void ShowTableDiffs(string tblName, string UserIDColName, IEnumerable<string> keyColumns, string rowFilter)
 		{
 			using var tbl = GetDT(tblName, keyColumns, rowFilter);
 
 			TemporalComparer tc = new(tbl);
+
+			if(!string.IsNullOrWhiteSpace(UserIDColName))
+			{ tc.UserIDColumn = tbl.Columns[UserIDColName]; }
 
 			if (keyColumns != null && keyColumns.Count() > 0)
 			{ tc.KeyColumns.AddRange(keyColumns); }
