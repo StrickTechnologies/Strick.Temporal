@@ -15,6 +15,9 @@ The `TemporalComparer` object will find differences in temporal data. It works w
 
 * If the rows in the DataTable are NOT all related, it assumes the rows are sorted first by the Key column(s), and newest->oldest within that.  *More on Key in the usage section below…*
 
+* *Optional*. You can set the Caption property of any column in your DataTable. The caption property is included in any `ColChange` objects for the column.
+  * **Note:** This is new for version 1.1.1
+
 ## Usage
 * The class to use is `Strick.Temporal.TemporalComparer`.  You’ll have to pass your DataTable to the constructor.
 
@@ -133,3 +136,11 @@ The above sample code returns results (for the DataTable created in the unit tes
     TerminationDate (5)  old:[] new:[5/31/2017 12:00:00 AM]
     TerminationReason (6)  old:[] new:[Left for another job]
 ```
+
+# `RowChange` object
+Used to represent changes in one or more columns between two related rows in your DataTable.
+
+# `ColChange` object
+Used to represent a change in a column between two related rows in your DataTable.
+
+**New:** For Version 1.1.1, the `ColChange` class has a new `Caption` property. The Caption property is automatically set by the `TemporalComparer` to the Caption property for the DataColumn.

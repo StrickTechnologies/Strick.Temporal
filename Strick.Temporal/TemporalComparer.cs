@@ -258,7 +258,7 @@ namespace Strick.Temporal
 						{ rc.Key = getKeyValue(NewRow).ToList(); }
 					}
 
-					rc.ColumnChanges.Add(new ColChange(NewRow.Table.Columns.IndexOf(col), col.ColumnName, OldRow[col], NewRow[col]));
+					rc.ColumnChanges.Add(new ColChange(NewRow.Table.Columns.IndexOf(col), col.ColumnName, col.Caption, OldRow[col], NewRow[col]));
 				}
 			}
 

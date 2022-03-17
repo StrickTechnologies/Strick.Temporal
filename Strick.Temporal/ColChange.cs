@@ -7,10 +7,11 @@ namespace Strick.Temporal
 {
 	public class ColChange
 	{
-		public ColChange(int ColumnIndex,string ColumnName, object OldValue, object NewValue)
+		public ColChange(int ColumnIndex,string ColumnName, string Caption, object OldValue, object NewValue)
 		{
 			this.ColumnIndex = ColumnIndex;
 			this.ColumnName = ColumnName;
+			this.Caption = Caption;
 			this.OldValue = OldValue;
 			this.NewValue = NewValue;
 		}
@@ -22,6 +23,8 @@ namespace Strick.Temporal
 		public int ColumnIndex { get; }
 
 		public string ColumnName { get; }
+
+		public string Caption { get; }
 
 		public object OldValue { get; }
 

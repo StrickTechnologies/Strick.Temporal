@@ -14,12 +14,12 @@ namespace Strick.Temporal.Test
 			//Build a simple Employee DataTable
 			DataTable t = new DataTable("Employees");
 			t.Columns.Add("ID", typeof(int));
-			t.Columns.Add("Name", typeof(string));
-			t.Columns.Add("JobTitle", typeof(string));
+			t.Columns.Add(new DataColumn("Name", typeof(string)) { Caption = "Employee Name" });
+			t.Columns.Add(new DataColumn("JobTitle", typeof(string)) { Caption = "Job Title" });
 			t.Columns.Add("Salary", typeof(decimal));
-			t.Columns.Add("HireDate", typeof(DateTime));
-			t.Columns.Add("TerminationDate", typeof(DateTime));
-			t.Columns.Add("TerminationReason", typeof(string));
+			t.Columns.Add(new DataColumn("HireDate", typeof(DateTime)) { Caption = "Hire Date" });
+			t.Columns.Add(new DataColumn("TerminationDate", typeof(DateTime)) { Caption = "Termination Date" });
+			t.Columns.Add(new DataColumn("TerminationReason", typeof(string)) { Caption = "Termination Reason" });
 			t.Columns.Add("SysStartTime", typeof(DateTime));
 			t.Columns.Add("SysEndTime", typeof(DateTime));
 			t.Columns.Add("ChangedBy", typeof(string));
@@ -105,6 +105,5 @@ namespace Strick.Temporal.Test
 
 		private static void AddEERow(DataTable tbl, int ID, string Name, string JobTitle, decimal Salary, DateTime Hire, DateTime? Termination, string TermReason, DateTime SysStartTime, DateTime SysEndTime, string changedBy)
 		{ tbl.Rows.Add(ID, Name, JobTitle, Salary, Hire, Termination, TermReason, SysStartTime, SysEndTime, changedBy); }
-
 	}
 }

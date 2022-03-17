@@ -34,6 +34,33 @@ namespace Strick.Temporal.Test
 			EE_NoTerminationChanges(tc);
 		}
 
+		[TestMethod]
+		public void TestColumnCaption()
+		{
+			TemporalComparer tc = EETest();
+			var rowChanges = tc.Changes.ToList();
+			Assert.IsNotNull(rowChanges);
+			Assert.AreEqual(7, rowChanges.Count());
+
+			Assert.AreEqual("Salary", rowChanges[0].ColumnChanges[0].Caption);
+			Assert.AreEqual("Salary", rowChanges[0].ColumnChanges[0].ColumnName);
+
+			Assert.AreEqual("Job Title", rowChanges[2].ColumnChanges[0].Caption);
+			Assert.AreEqual("JobTitle", rowChanges[2].ColumnChanges[0].ColumnName);
+			Assert.AreEqual("Salary", rowChanges[2].ColumnChanges[1].Caption);
+			Assert.AreEqual("Salary", rowChanges[2].ColumnChanges[1].ColumnName);
+
+			Assert.AreEqual("Job Title", rowChanges[4].ColumnChanges[0].Caption);
+			Assert.AreEqual("JobTitle", rowChanges[4].ColumnChanges[0].ColumnName);
+			Assert.AreEqual("Salary", rowChanges[4].ColumnChanges[1].Caption);
+			Assert.AreEqual("Salary", rowChanges[4].ColumnChanges[1].ColumnName);
+
+			Assert.AreEqual("Termination Date", rowChanges[6].ColumnChanges[0].Caption);
+			Assert.AreEqual("TerminationDate", rowChanges[6].ColumnChanges[0].ColumnName);
+			Assert.AreEqual("Termination Reason", rowChanges[6].ColumnChanges[1].Caption);
+			Assert.AreEqual("TerminationReason", rowChanges[6].ColumnChanges[1].ColumnName);
+		}
+
 		private void ResetComparerState(TemporalComparer tc)
 		{
 			//ensure temporal comparer state is correct
