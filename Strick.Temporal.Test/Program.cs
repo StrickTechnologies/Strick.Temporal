@@ -1,12 +1,10 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Strick.Temporal.Test
 {
@@ -14,6 +12,14 @@ namespace Strick.Temporal.Test
 	{
 		static void Main(string[] args)
 		{
+			ParPerson p = Par.promptForPerson();
+			while (p != null)
+			{
+				Par.showPerson(p);
+				p = Par.promptForPerson();
+			}
+			return;
+
 			//var tc = TemporalComparerTests.EETest();
 			//ShowRC(tc);
 
@@ -25,6 +31,51 @@ namespace Strick.Temporal.Test
 			wl("");
 			ShowTableDiffs("Person", "ModifiedUserId", new[] { "id" }, "id in(264)");
 		}
+
+		//private static ParPerson getPerson()
+		//{
+		//	string pid = rl("Enter a Person Id (0 or <enter> to exit): ");
+
+		//	int id = 0;
+		//	if (!string.IsNullOrWhiteSpace(pid) && int.TryParse(pid, out id) && id > 0)
+		//	{ return ParPersonRepository.byID(id); }
+
+		//	return null;
+		//}
+
+		//private static void showPerson(ParPerson person)
+		//{
+		//	Console.ForegroundColor = ConsoleColor.Red;
+		//	wl($"*** Person: {person.PersonID} {person.FirstName} {person.LastName}");
+		//	Console.ResetColor();
+
+		//	showPersonHistory(person);
+		//	wl("");
+		//}
+
+		//public static void showPersonHistory(ParPerson person)
+		//{
+		//	if (person.ChangeHistory != null && person.ChangeHistory.Count > 0)
+		//	{
+		//		foreach (RowChange rc in person.ChangeHistory)
+		//		{
+		//			Console.ForegroundColor = ConsoleColor.Green;
+		//			wl($"\t* Changes made by {rc.UserID} at:{rc.ChangeTime}");
+		//			Console.ResetColor();
+
+		//			foreach (ColChange cc in rc.ColumnChanges)
+		//			{ wl($"\t\t{cc.Caption}  old:[{cc.OldValue}] new:[{cc.NewValue}]"); }
+		//			wl("");
+		//		}
+		//	}
+		//	else
+		//	{
+		//		Console.ForegroundColor = ConsoleColor.Green;
+		//		wl("\tThis person has no changes.");
+		//		Console.ResetColor();
+		//	}
+		//}
+
 
 		private static void Test1()
 		{
@@ -88,7 +139,7 @@ namespace Strick.Temporal.Test
 
 			TemporalComparer tc = new(tbl);
 
-			if(!string.IsNullOrWhiteSpace(UserIDColName))
+			if (!string.IsNullOrWhiteSpace(UserIDColName))
 			{ tc.UserIDColumn = tbl.Columns[UserIDColName]; }
 
 			if (keyColumns != null && keyColumns.Count() > 0)
@@ -180,19 +231,21 @@ namespace Strick.Temporal.Test
 
 
 
-		public static void ShowRC(TemporalComparer tc)
+		public static void ShowRC(TemporalComparer tc) => ShowRC(tc.Changes);
+
+		public static void ShowRC(IEnumerable<RowChange> rowChanges)
 		{
-			foreach (RowChange rc in tc.Changes)
+			foreach (RowChange rc in rowChanges)
 			{
 				w($"* Row Change: Index:{rc.RowIndex} At:{rc.ChangeTime}");
 
-				if (tc.HasKey)
+				if (rc.Key != null)
 				{ w($" Key:{string.Join(".", rc.Key)} "); }
 
-				if (tc.HasUserIDColumn)
+				if (rc.UserID != null)
 				{ w($" by User ID:{rc.UserID}"); }
 
-				if (tc.HasEndTimeColumn)
+				if (rc.PeriodEndTime != null)
 				{ w($" (row end time: {rc.PeriodEndTime})"); }
 
 
@@ -206,12 +259,20 @@ namespace Strick.Temporal.Test
 		}
 
 
-		private static void rk(string prompt = null)
+		public static void rk(string prompt = null)
 		{
 			if (!string.IsNullOrWhiteSpace(prompt))
 			{ w(prompt); }
 
 			Console.ReadKey();
+		}
+
+		public static string rl(string prompt = null)
+		{
+			if (!string.IsNullOrWhiteSpace(prompt))
+			{ w(prompt); }
+
+			return Console.ReadLine();
 		}
 
 		public static void w(string message) => Console.Write(message);
