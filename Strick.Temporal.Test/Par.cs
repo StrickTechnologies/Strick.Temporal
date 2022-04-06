@@ -66,12 +66,14 @@ namespace Strick.Temporal.Test
 		{
 			string where = !string.IsNullOrWhiteSpace(rowFilter) ? $"where {rowFilter}" : "";
 
+
 			using SqlConnection conn = GetDBConnection();
 			using SqlCommand cmd = new($"SELECT * FROM {tblName} {where}", conn);
 			using SqlDataAdapter da = new(cmd);
 
-			using DataTable tbl = new();
-			da.Fill(tbl);
+			//using DataTable tbl = new();
+			//da.Fill(tbl);
+			using DataTable tbl =  GetDT($"SELECT * FROM {tblName} {where}");
 
 			if (tbl != null && tbl.Rows.Count > 0)
 			{ return tbl.Rows[0]; }
@@ -79,7 +81,8 @@ namespace Strick.Temporal.Test
 			return null;
 		}
 
-		public static DataTable GetDT(string tblName, IEnumerable<string> keyColumns, string rowFilter)
+
+		public static DataTable GetTemporalHistory(string tblName, IEnumerable<string> keyColumns, string rowFilter)
 		{
 			string where = !string.IsNullOrWhiteSpace(rowFilter) ? $"where {rowFilter}" : "";
 			string order;
@@ -87,9 +90,14 @@ namespace Strick.Temporal.Test
 			{ order = $"order by {string.Join(",", keyColumns)},SysEndTime desc"; }
 			else
 			{ order = $"order by SysEndTime desc"; }
+			
+			return GetDT($"SELECT *, SysStartTime, SysEndTime FROM {tblName} for system_time all {where} {order}");
+		}
 
+		public static DataTable GetDT(string sql)
+		{
 			using SqlConnection conn = GetDBConnection();
-			using SqlCommand cmd = new($"SELECT *, SysStartTime, SysEndTime FROM {tblName} for system_time all {where} {order}", conn);
+			using SqlCommand cmd = new(sql, conn);
 			using SqlDataAdapter da = new(cmd);
 
 			DataTable tbl = new();
@@ -151,13 +159,22 @@ namespace Strick.Temporal.Test
 			if (person == null)
 			{ throw new ArgumentNullException(); }
 
-			using DataTable dt = ParDB.GetDT("Person", new[] { "Id" }, $"Id={person.PersonID}");
+			string where = $"where Id={person.PersonID}";
+			string flds = "Id, FirstName, LastName, Initials, UserId, JobTitleId, DepartmentId, TesterNumber, TerritoryId, IdStatusId, EndUser, Referral, AlsoManages, MailToAddressId, Notes, IsActive, DeletedDateTime, DeletedUserId, CreatedDateTime, CreatedUserId, ModifiedDateTime, ModifiedUserId, SysStartTime, SysEndTime, PrivateNotes, CompanyId, ContactId";
+			string sql = $"select {flds} from Person {where} union (select {flds} from Person_History {where}) order by SysEndTime desc";
+			using DataTable dt = ParDB.GetDT(sql);
 
 			if (dt == null || dt.Rows.Count < 2)
 			{
 				//nothing to compare, just return an empty set
 				return new List<RowChange>();
 			}
+
+			//just for fun...
+			dt.Columns["FirstName"].Caption = "First Name";
+			dt.Columns["LastName"].Caption = "Last Name";
+			dt.Columns["MailToAddressId"].Caption = "Mail To Address ID";
+			dt.Columns["PrivateNotes"].Caption = "Private Notes";
 
 			TemporalComparer tc = new(dt);
 			tc.UserIDColumn = dt.Columns["ModifiedUserId"];
