@@ -159,10 +159,15 @@ namespace Strick.Temporal.Test
 			if (person == null)
 			{ throw new ArgumentNullException(); }
 
+			//to use "union" query
 			string where = $"where Id={person.PersonID}";
 			string flds = "Id, FirstName, LastName, Initials, UserId, JobTitleId, DepartmentId, TesterNumber, TerritoryId, IdStatusId, EndUser, Referral, AlsoManages, MailToAddressId, Notes, IsActive, DeletedDateTime, DeletedUserId, CreatedDateTime, CreatedUserId, ModifiedDateTime, ModifiedUserId, SysStartTime, SysEndTime, PrivateNotes, CompanyId, ContactId";
 			string sql = $"select {flds} from Person {where} union (select {flds} from Person_History {where}) order by SysEndTime desc";
 			using DataTable dt = ParDB.GetDT(sql);
+			
+			//to use "for system_time all" clause
+			//  note: "for system_time all" *excludes* history records with matching start/end times (i.e. rows where SysStartTime = SysEndTime)
+			//using DataTable dt = ParDB.GetTemporalHistory("Person", new[] { "Id" }, $"Id={person.PersonID}");
 
 			if (dt == null || dt.Rows.Count < 2)
 			{
