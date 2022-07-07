@@ -4,7 +4,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
-
+using System.Text.RegularExpressions;
 
 namespace Strick.Temporal.Test;
 
@@ -14,7 +14,7 @@ class Program
 	static void Main(string[] args)
 	{
 		ParPerson p = Par.promptForPerson();
-		while(p != null)
+		while (p != null)
 		{
 			Par.showPerson(p);
 			p = Par.promptForPerson();
@@ -25,11 +25,11 @@ class Program
 		//ShowRC(tc);
 
 		ShowTableDiffs("Company", "ModifiedUserId", new[] { "id" });
-		wl("");
+		wl();
 		ShowTableDiffs("PersonEmailAssn", null, new[] { "personid", "emailid" });
 		ShowTableDiffs("PersonEmailAssn", null, new[] { "personid" }, "personid not in(25273,25207)"); //skip the IDs that have multiple "current" records
 
-		wl("");
+		wl();
 		ShowTableDiffs("Person", "ModifiedUserId", new[] { "id" }, "id in(264)");
 	}
 
@@ -51,7 +51,7 @@ class Program
 	//	Console.ResetColor();
 
 	//	showPersonHistory(person);
-	//	wl("");
+	//	wl();
 	//}
 
 	//public static void showPersonHistory(ParPerson person)
@@ -66,7 +66,7 @@ class Program
 
 	//			foreach (ColChange cc in rc.ColumnChanges)
 	//			{ wl($"\t\t{cc.Caption}  old:[{cc.OldValue}] new:[{cc.NewValue}]"); }
-	//			wl("");
+	//			wl();
 	//		}
 	//	}
 	//	else
@@ -114,7 +114,7 @@ class Program
 		dt.DefaultView.Sort = "SysStartTime desc";
 		dt = dt.DefaultView.ToTable();
 
-		//wl("");
+		//wl();
 		//PrintSt(dt);
 
 		TemporalComparer tc = new TemporalComparer(dt);
@@ -140,14 +140,14 @@ class Program
 
 		TemporalComparer tc = new(tbl);
 
-		if(!string.IsNullOrWhiteSpace(UserIDColName))
+		if (!string.IsNullOrWhiteSpace(UserIDColName))
 		{ tc.UserIDColumn = tbl.Columns[UserIDColName]; }
 
-		if(keyColumns != null && keyColumns.Count() > 0)
+		if (keyColumns != null && keyColumns.Count() > 0)
 		{ tc.KeyColumns.AddRange(keyColumns); }
 
 		wl($"*** CHANGES IN {tblName} TABLE ***");
-		if(!string.IsNullOrWhiteSpace(rowFilter))
+		if (!string.IsNullOrWhiteSpace(rowFilter))
 		{ wl($"\tfilter is \"{rowFilter}\""); }
 
 		ShowRC(tc);
@@ -157,7 +157,7 @@ class Program
 	{
 		string where = !string.IsNullOrWhiteSpace(rowFilter) ? $"where {rowFilter}" : "";
 		string order;
-		if(keyColumns != null && keyColumns.Count() > 0)
+		if (keyColumns != null && keyColumns.Count() > 0)
 		{ order = $"order by {string.Join(",", keyColumns)},SysEndTime desc"; }
 		else
 		{ order = $"order by SysEndTime desc"; }
@@ -180,7 +180,7 @@ class Program
 
 	private static void PrintSt(DataTable dt)
 	{
-		foreach(DataRow r in dt.Rows)
+		foreach (DataRow r in dt.Rows)
 		{ wl($"{r["SysStartTime"]}"); }
 	}
 
@@ -215,14 +215,14 @@ class Program
 
 		var lines = File.ReadAllLines(fname).ToList();
 		lines.RemoveAt(0); //remove header row
-		foreach(string ln in lines)
+		foreach (string ln in lines)
 		{
 			var r = t1.Rows.Add();
 
 			string[] cols = ln.Split(',');
-			for(int i = 0; i < cols.Count(); i++)
+			for (int i = 0; i < cols.Count(); i++)
 			{
-				if(!cols[i].Equals("NULL"))
+				if (!cols[i].Equals("NULL"))
 				{ r[i] = cols[i]; }
 			}
 		}
@@ -236,14 +236,14 @@ class Program
 
 	public static void ShowRC(IEnumerable<RowChange> rowChanges)
 	{
-		foreach(RowChange rc in rowChanges)
+		foreach (RowChange rc in rowChanges)
 		{
 			w($"* Row Change: Index:{rc.RowIndex} At:{rc.ChangeTime}");
 
-			if(rc.Key != null)
+			if (rc.Key != null)
 			{ w($" Key:{string.Join(".", rc.Key)} "); }
 
-			if(rc.UserID != null)
+			if (rc.UserID != null)
 			{ w($" by User ID:{rc.UserID}"); }
 
 			w($" (row end time: {rc.PeriodEndTime})");
@@ -251,9 +251,9 @@ class Program
 
 			wl("\n  Col changes:");
 
-			foreach(ColChange cc in rc.ColumnChanges)
+			foreach (ColChange cc in rc.ColumnChanges)
 			{ wl($"    {cc.ColumnName} ({cc.ColumnIndex})  old:[{cc.OldValue}] new:[{cc.NewValue}]"); }
-			wl("");
+			wl();
 		}
 
 	}
@@ -261,7 +261,7 @@ class Program
 
 	public static void rk(string prompt = null)
 	{
-		if(!string.IsNullOrWhiteSpace(prompt))
+		if (!string.IsNullOrWhiteSpace(prompt))
 		{ w(prompt); }
 
 		Console.ReadKey();
@@ -269,14 +269,41 @@ class Program
 
 	public static string rl(string prompt = null)
 	{
-		if(!string.IsNullOrWhiteSpace(prompt))
+		if (!string.IsNullOrWhiteSpace(prompt))
 		{ w(prompt); }
 
 		return Console.ReadLine();
 	}
 
 	public static void w(string message) => Console.Write(message);
+	public static void wl() => Console.WriteLine();
 	public static void wl(string message) => Console.WriteLine(message);
 
-	//public static void dwl(string message) => Debug.WriteLine(message);
+	public static void w(string message, ConsoleColor color, bool stripDelimiters = true)
+	{
+		//use { and } for delimiters since some data we're testing with has [ and ] in it
+		//var segments = Regex.Split(message, @"(\[[^\]]*\])");
+		var segments = Regex.Split(message, @"({[^}]*})");
+		for (int x = 0; x < segments.Length; x++)
+		{
+			string segment = segments[x];
+
+			//if (segment.StartsWith("[") && segment.EndsWith("]"))
+			if (segment.StartsWith("{") && segment.EndsWith("}"))
+			{
+				Console.ForegroundColor = color;
+
+				if (stripDelimiters)
+				{ segment = segment.Substring(1, segment.Length - 2); }
+			}
+
+			w(segment);
+			Console.ResetColor();
+		}
+	}
+	public static void wl(string message, ConsoleColor color, bool stripDelimiters = true)
+	{
+		w(message, color, stripDelimiters);
+		wl();
+	}
 }

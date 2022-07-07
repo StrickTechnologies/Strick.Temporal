@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using static Strick.Temporal.Test.Program;
 
 
@@ -30,7 +31,7 @@ namespace Strick.Temporal.Test
 			Console.ResetColor();
 
 			showPersonHistory(person);
-			wl("");
+			wl();
 		}
 
 		public static void showPersonHistory(ParPerson person)
@@ -44,8 +45,7 @@ namespace Strick.Temporal.Test
 					Console.ResetColor();
 
 					foreach (ColChange cc in rc.ColumnChanges)
-					{ wl($"\t\t{cc.Caption}  old:[{cc.OldValue}] new:[{cc.NewValue}]"); }
-					wl("");
+					{ wl($"\t\t{cc.Caption}  old:[{{{cc.OldValue}}}] new:[{{{cc.NewValue}}}]", ConsoleColor.Blue); }
 				}
 			}
 			else
@@ -73,7 +73,7 @@ namespace Strick.Temporal.Test
 
 			//using DataTable tbl = new();
 			//da.Fill(tbl);
-			using DataTable tbl =  GetDT($"SELECT * FROM {tblName} {where}");
+			using DataTable tbl = GetDT($"SELECT * FROM {tblName} {where}");
 
 			if (tbl != null && tbl.Rows.Count > 0)
 			{ return tbl.Rows[0]; }
@@ -90,7 +90,7 @@ namespace Strick.Temporal.Test
 			{ order = $"order by {string.Join(",", keyColumns)},SysEndTime desc"; }
 			else
 			{ order = $"order by SysEndTime desc"; }
-			
+
 			return GetDT($"SELECT *, SysStartTime, SysEndTime FROM {tblName} for system_time all {where} {order}");
 		}
 
@@ -164,7 +164,7 @@ namespace Strick.Temporal.Test
 			string flds = "Id, FirstName, LastName, Initials, UserId, JobTitleId, DepartmentId, TesterNumber, TerritoryId, IdStatusId, EndUser, Referral, AlsoManages, MailToAddressId, Notes, IsActive, DeletedDateTime, DeletedUserId, CreatedDateTime, CreatedUserId, ModifiedDateTime, ModifiedUserId, SysStartTime, SysEndTime, PrivateNotes, CompanyId, ContactId";
 			string sql = $"select {flds} from Person {where} union (select {flds} from Person_History {where}) order by SysEndTime desc";
 			using DataTable dt = ParDB.GetDT(sql);
-			
+
 			//to use "for system_time all" clause
 			//  note: "for system_time all" *excludes* history records with matching start/end times (i.e. rows where SysStartTime = SysEndTime)
 			//using DataTable dt = ParDB.GetTemporalHistory("Person", new[] { "Id" }, $"Id={person.PersonID}");
@@ -183,7 +183,7 @@ namespace Strick.Temporal.Test
 
 			TemporalComparer tc = new(dt);
 			tc.UserIDColumn = dt.Columns["ModifiedUserId"];
-			return tc.Changes;
+			return tc.Changes; //.OrderByDescending(rc=>rc.ChangeTime);
 		}
 	}
 }
