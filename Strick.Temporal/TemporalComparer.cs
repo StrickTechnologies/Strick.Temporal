@@ -2,20 +2,18 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
 
 
 namespace Strick.Temporal
 {
 	/// <summary>
-	/// </para>Iterates related rows in a DataTable (e.g. from a system versioned/temporal table) and returns a sequence containing information about the changes between related rows.</para>
+	/// <para>Iterates related rows in a DataTable (e.g. from a system versioned/temporal table) and returns a sequence containing information about the changes between related rows.</para>
 	/// <para>Use the KeyColumn property to indicate which column is the key that designates "related" rows.  All rows with the same Key are considered "related".</para>
 	/// <para>If KeyColumn is null (the default), ALL rows in the DataTable are assumed to be related.</para>
 	/// <para>Rows in the DataTable are assumed to be ordered descending on SysStartTime (newest to oldest).</para>
 	/// </summary>
 	public class TemporalComparer
 	{
-
 		protected static readonly string StartTimeColName = "SysStartTime";
 		protected static readonly string EndTimeColName = "SysEndTime";
 
@@ -30,9 +28,9 @@ namespace Strick.Temporal
 		{
 			this.Table = Table;
 
-			if (StartTimeColumn == null)
+			if(StartTimeColumn == null)
 			{
-				if (Table.Columns[StartTimeColName] != null && Table.Columns[StartTimeColName].DataType == typeof(System.DateTime))
+				if(Table.Columns[StartTimeColName] != null && Table.Columns[StartTimeColName].DataType == typeof(System.DateTime))
 				{ StartTimeColumn = Table.Columns[StartTimeColName]; }
 				else
 				{ throw new ArgumentNullException($"StartTimeColumn is not specified, and default column ({StartTimeColName}) not found."); }
@@ -42,13 +40,13 @@ namespace Strick.Temporal
 				//throw an exception if the column doesn't belong to Table
 				IsValidCol(StartTimeColumn, true);
 
-				if (StartTimeColumn.DataType != typeof(System.DateTime))
+				if(StartTimeColumn.DataType != typeof(System.DateTime))
 				{ throw new ArgumentException("StartTimeColumn must be of DateTime type."); }
 			}
 
 			this.StartTimeColumn = StartTimeColumn;
 
-			if (Table.Columns[EndTimeColName] != null && Table.Columns[EndTimeColName].DataType == typeof(System.DateTime))
+			if(Table.Columns[EndTimeColName] != null && Table.Columns[EndTimeColName].DataType == typeof(System.DateTime))
 			{ EndTimeColumn = Table.Columns[EndTimeColName]; }
 
 			IncludedColumns = new TemporalComparerColumnList(this);
@@ -87,7 +85,7 @@ namespace Strick.Temporal
 
 			set
 			{
-				if (value == null || IsValidCol(value, true))
+				if(value == null || IsValidCol(value, true))
 				{ etcol = value; }
 			}
 		}
@@ -112,7 +110,7 @@ namespace Strick.Temporal
 
 			set
 			{
-				if (value == null || IsValidCol(value, true))
+				if(value == null || IsValidCol(value, true))
 				{ uidcol = value; }
 			}
 		}
@@ -136,12 +134,6 @@ namespace Strick.Temporal
 
 		public bool HasKey => KeyColumns != null && KeyColumns.Count > 0;
 
-		///// <summary>
-		///// Gets/sets a value which indicates whether or not to include the column designated by KeyColumn in the comparison.  
-		///// Default is false.  Ignored if KeyColumn is null.
-		///// </summary>
-		//public bool IncludeKeyColumn { get; set; } = false;
-
 
 		/// <summary>
 		/// Returns a List&lt;DataColumn&gt; which contains the columns to process.  
@@ -164,13 +156,13 @@ namespace Strick.Temporal
 
 		protected IEnumerable<DataColumn> GetCols()
 		{
-			if (IncludedColumns != null && IncludedColumns.Count > 0)
+			if(IncludedColumns != null && IncludedColumns.Count > 0)
 			{
 				//The columns to compare have been specified...
 				return (from DataColumn c in Table.Columns select c).Where(c => IncludedColumns.Contains(c) || IncludeCol(c, false));
 			}
 
-			if (ExcludedColumns != null && ExcludedColumns.Count > 0)
+			if(ExcludedColumns != null && ExcludedColumns.Count > 0)
 			{
 				//Compare all columns except those specified
 				return (from DataColumn c in Table.Columns select c).Where(c => !ExcludedColumns.Contains(c) && IncludeCol(c, true));
@@ -182,17 +174,17 @@ namespace Strick.Temporal
 
 		protected bool IncludeCol(DataColumn Col, bool Default)
 		{
-			if (!IsValidCol(Col, false))
+			if(!IsValidCol(Col, false))
 			{ return false; }
 
 
-			if (Col == UserIDColumn)
+			if(Col == UserIDColumn)
 			{ return IncludeUserIDColumn; }
 
-			if (Col == StartTimeColumn)
+			if(Col == StartTimeColumn)
 			{ return IncludeStartTimeColumn; }
 
-			if (Col == EndTimeColumn)
+			if(Col == EndTimeColumn)
 			{ return IncludeEndTimeColumn; }
 
 
@@ -201,7 +193,7 @@ namespace Strick.Temporal
 
 
 		/// <summary>
-		/// <para>Returns an <see cref="IEnumerable{}"/> of type <see cref="RowChange"/> containing information about the changes between related rows in the DataTable.</para>
+		/// <para>Returns an <see cref="IEnumerable{RowChange}"/> of type <see cref="RowChange"/> containing information about the changes between related rows in the DataTable.</para>
 		/// <para><b>** The returned sequence of changes is NOT cached -- the comparison is run each time this property is accessed.</b>  
 		/// If you need to access the returned changes multiple times, cache the returned value, for example: 
 		/// <code>IEnumerable&lt;RowChg&gt; MyChanges = myTemporalComparer.Changes;</code>
@@ -212,25 +204,25 @@ namespace Strick.Temporal
 		protected IEnumerable<RowChange> GetChanges()
 		{
 			//if no table or only one record
-			if (Table == null || Table.Rows.Count < 2)
+			if(Table == null || Table.Rows.Count < 2)
 			{ yield break; }
 
 			Cols = GetCols();
 
 			//assumes rows ordered newest to oldest...
-			for (int r = Table.Rows.Count - 1; r > 0; r--)
+			for(int r = Table.Rows.Count - 1; r > 0; r--)
 			{
-				if (HasKey)
+				if(HasKey)
 				{
 					//when key changes, find next two matching rows
-					while (r > 0 && !KeysEqual(Table.Rows[r], Table.Rows[r - 1]))
+					while(r > 0 && !KeysEqual(Table.Rows[r], Table.Rows[r - 1]))
 					{ r--; }
-					if (r == 0)
+					if(r == 0)
 					{ break; }
 				}
 
 				RowChange chg = CompareRows(Table.Rows[r], Table.Rows[r - 1]);
-				if (chg != null)
+				if(chg != null)
 				{ yield return chg; }
 			}
 		}
@@ -240,21 +232,21 @@ namespace Strick.Temporal
 		{
 			RowChange rc = null;
 
-			foreach (DataColumn col in Cols)
+			foreach(DataColumn col in Cols)
 			{
-				if (!NewRow[col.Ordinal].Equals(OldRow[col.Ordinal]))
+				if(!NewRow[col.Ordinal].Equals(OldRow[col.Ordinal]))
 				{
-					if (rc == null)
+					if(rc == null)
 					{
 						rc = new RowChange(NewRow.Table.Rows.IndexOf(NewRow), (DateTime)NewRow[StartTimeColumn]);
 
-						if (EndTimeColumn != null)
+						if(EndTimeColumn != null)
 						{ rc.PeriodEndTime = (DateTime)NewRow[EndTimeColumn]; }
 
-						if (UserIDColumn != null)
+						if(UserIDColumn != null)
 						{ rc.UserID = NewRow[UserIDColumn]; }
 
-						if (HasKey)
+						if(HasKey)
 						{ rc.Key = getKeyValue(NewRow).ToList(); }
 					}
 
@@ -268,12 +260,12 @@ namespace Strick.Temporal
 		private bool KeysEqual(DataRow OldRow, DataRow NewRow)
 		{
 			//should NOT get here in this case, so just a failsafe...
-			if (!HasKey)
+			if(!HasKey)
 			{ return true; }
 
-			foreach (DataColumn col in KeyColumns)
+			foreach(DataColumn col in KeyColumns)
 			{
-				if (!NewRow[col.Ordinal].Equals(OldRow[col.Ordinal]))
+				if(!NewRow[col.Ordinal].Equals(OldRow[col.Ordinal]))
 				{ return false; }
 			}
 
@@ -282,7 +274,7 @@ namespace Strick.Temporal
 
 		private IEnumerable<object> getKeyValue(DataRow row)
 		{
-			foreach (DataColumn col in KeyColumns)
+			foreach(DataColumn col in KeyColumns)
 			{ yield return row[col]; }
 		}
 
@@ -294,17 +286,17 @@ namespace Strick.Temporal
 		/// </summary>
 		internal bool IsValidCol(DataColumn Col, bool Throw)
 		{
-			if (Col == null)
+			if(Col == null)
 			{
-				if (Throw)
+				if(Throw)
 				{ throw new ArgumentNullException("Null column is invalid"); }
 				else
 				{ return false; }
 			}
 
-			if (Col.Table != Table) //ensure the column belongs to Table
+			if(Col.Table != Table) //ensure the column belongs to Table
 			{
-				if (Throw)
+				if(Throw)
 				{ throw new ArgumentException("Column does not belong to this table"); }
 				else
 				{ return false; }
