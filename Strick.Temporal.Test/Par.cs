@@ -182,6 +182,7 @@ namespace Strick.Temporal.Test
 			dt.Columns["PrivateNotes"].Caption = "Private Notes";
 
 			TemporalComparer tc = new(dt);
+			tc.ChangesSortDirection = System.ComponentModel.ListSortDirection.Descending;
 			tc.UserIDColumn = dt.Columns["ModifiedUserId"];
 			return tc.Changes; //.OrderByDescending(rc=>rc.ChangeTime);
 		}

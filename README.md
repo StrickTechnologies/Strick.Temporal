@@ -1,6 +1,10 @@
 # Strick.Temporal
 Utilities for working with temporal data in .Net
 
+# Overview
+We follow [semantic versioning](https://semver.org/).
+* As of version 1.2.0, we will follow the SemVer spec as closely as possible. Prior to that version, it may not have been followed as faithfully, which shouldn't matter since no one is using those versions. :-)
+
 # `TemporalComparer` object
 The `TemporalComparer` object will find differences in temporal data. It works with a DataTable object containing temporal data.
 
@@ -28,8 +32,9 @@ The `TemporalComparer` object will find differences in temporal data. It works w
 * *Optional*.  You can specify the period end time column using the `EndTimeColumn` property. If you set this, the value from the specified column will be put into the `PeriodEndTime` property of each `RowChange` object.  If you don’t set this, the `PeriodEndTime` property in each `RowChange` object will be null.
 
 * *Optional*.  You can specify the column(s) that make up the "key" for each row using the `KeyColumns` property.  Use this if your DataTable contains rows that are not all for the same entity (e.g. your DataTable contains rows for multiple People or multiple Companies).  If you set this, the comparer will only compare (and return results) for rows whose key value matches.  And, the value(s) from the specified column(s) will be put into the `Key` property of each `RowChange` object.  If you don’t set this, the `Key` property in each `RowChange` object will be null and the comparer assumes ALL rows in the DataTable are related.
-
 	* **New:** Version 1.1.0 now supports multi-column keys. Prior to that version, only single-column keys were supported.
+
+* *Optional*.  Use the `ChangesSortDirection` property (new for version 1.2.0) to control the order of the results returned by the comparer. [Additional details](#sorting)
 
 * *Optional*.  If for some reason you want to include any of the above special columns in the comparisons, you can use the `IncludeStartTimeColumn`, `IncludeEndTimeColumn`, `IncludeUserIDColumn`, properties.  These all default to false (because they should most always be different between rows, and are already included in the `RowChange` objects when appropriate).  This is primarily a debugging and testing tool, but maybe there are some other legitimate uses…
 
@@ -62,10 +67,12 @@ Then use that variable to subsequently access the results.
 
 ### Other Details...
 * Each `RowChange` object is guaranteed to have at least one `ColChange` object in its `ColumnChanges` property.
-
 	* If two related rows in your DataTable don’t have any differences (this can happen if you’re only looking at a subset of the columns), no `RowChange` object is returned for those two rows.
 
-* The results are sorted chronologically, oldest->newest.
+<a name="sorting"></a>
+* The results are ordered by each of the key fields in descending order, then by the `RowChange.ChangeTime` property in ascending (oldest->newest) order within the key. This ordering occurs naturally based on the order of the source DataTable and the comparer's traversal of the rows (no additional sorting is performed). The default ordering can be overridden using the `ChangesSortDirection` property (new for version 1.2.0).
+	* The default value for `ChangesSortDirection` is `ListSortDirection.Ascending`. This results in the ordering described above.
+	* Changing the `ChangesSortDirection` to `ListSortDirection.Descending` will produce results ordered as follows: the results will first be sorted by each of the Key fields in ascending order, then by the `RowChange.ChangeTime` property in descending (newest->oldest) order within the key.
 
 ## Example
 This sample works with the DataTable created in the unit tests for the project. **Note:** the `ShowRC` function is generic, and will work with any DataTable meeting the [requirements](#datatable-requirements).
