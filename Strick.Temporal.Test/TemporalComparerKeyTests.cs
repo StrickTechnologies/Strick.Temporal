@@ -72,7 +72,7 @@ public class TemporalComparerKeyTests
 
 		var rowChanges = tc.Changes.ToList();
 
-		Program.ShowRC(rowChanges);
+		//Program.ShowRC(rowChanges);
 
 		Assert.IsNotNull(rowChanges);
 		Assert.AreEqual(7, rowChanges.Count());

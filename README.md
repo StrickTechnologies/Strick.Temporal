@@ -2,8 +2,11 @@
 Utilities for working with temporal data in .Net
 
 # Overview
-We follow [semantic versioning](https://semver.org/).
-* As of version 1.2.0, we will follow the SemVer spec as closely as possible. Prior to that version, it may not have been followed as faithfully, which shouldn't matter since no one is using those versions. :-)
+There are three main objects you will work with.
+
+* [`TemporalComparer` object](#temporalcomparer-object)
+* [`RowChange` object](#rowchange-object)
+* [`ColChange` object](#colchange-object)
 
 # `TemporalComparer` object
 The `TemporalComparer` object will find differences in temporal data. It works with a DataTable object containing temporal data.
@@ -19,7 +22,7 @@ The `TemporalComparer` object will find differences in temporal data. It works w
 
 * If the rows in the DataTable are NOT all related, it assumes the rows are sorted first by the Key column(s), and newest->oldest within that.  *More on Key in the usage section below…*
 
-* *Optional*. You can set the Caption property of any column in your DataTable. The caption property is included in any `ColChange` objects for the column.
+* *Optional*. You can set the `Caption` property of any column in your DataTable. The `Caption` property is included in any `ColChange` objects for the column. If not specifically set, the `DataColumn.Caption` property returns the `DataColumn.ColumnName` value.
   * **Note:** This is new for version 1.1.1
 
 ## Usage
@@ -76,7 +79,7 @@ Then use that variable to subsequently access the results.
 
 ## Example
 This sample works with the DataTable created in the unit tests for the project. **Note:** the `ShowRC` function is generic, and will work with any DataTable meeting the [requirements](#datatable-requirements).
-```
+```c#
 TemporalComparer tc = new TemporalComparer(MyDataTable);
 tc.UserIDColumn = MyDataTable.Columns["ChangedBy"];
 tc.KeyColumn = MyDataTable.Columns["ID"];
@@ -151,3 +154,9 @@ Used to represent changes in one or more columns between two related rows in you
 Used to represent a change in a column between two related rows in your DataTable.
 
 **New:** For Version 1.1.1, the `ColChange` class has a new `Caption` property. The Caption property is automatically set by the `TemporalComparer` to the Caption property for the DataColumn.
+
+# Other
+
+## Semantic versioning
+
+We follow [semantic versioning](https://semver.org/).

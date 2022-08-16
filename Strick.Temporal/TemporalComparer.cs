@@ -8,23 +8,30 @@ using System.Linq;
 namespace Strick.Temporal
 {
 	/// <summary>
-	/// <para>Iterates related rows in a DataTable (e.g. from a system versioned/temporal table) and returns a sequence containing information about the changes between related rows.</para>
-	/// <para>Use the KeyColumn property to indicate which column is the key that designates "related" rows.  All rows with the same Key are considered "related".</para>
-	/// <para>If KeyColumn is null (the default), ALL rows in the DataTable are assumed to be related.</para>
+	/// <para>Iterates related rows in a DataTable (e.g. from a system versioned/temporal table) and returns a sequence containing 
+	/// information about the changes between related rows.</para>
+	/// <para>Use the <see cref="KeyColumns"/> property to indicate which column(s) designate "related" rows.  
+	/// Rows with the same Key are considered "related".</para>
+	/// <para>If <see cref="KeyColumns"/> is null (the default), ALL rows in the DataTable are assumed to be related.</para>
 	/// <para>Rows in the DataTable are assumed to be ordered descending on SysStartTime (newest to oldest).</para>
 	/// </summary>
 	public class TemporalComparer
 	{
-		protected static readonly string StartTimeColName = "SysStartTime";
-		protected static readonly string EndTimeColName = "SysEndTime";
+		private static readonly string StartTimeColName = "SysStartTime";
+		private static readonly string EndTimeColName = "SysEndTime";
 
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TemporalComparer"/> class.
+		/// </summary>
+		/// <param name="Table">The DataTable containing the rows to compare.</param>
 		public TemporalComparer(DataTable Table) : this(Table, null) { }
 
 		/// <summary>
+		/// <inheritdoc cref="TemporalComparer.TemporalComparer(DataTable)"/>
 		/// </summary>
-		/// <param name="Table">The DataTable containing the rows to compare.</param>
-		/// <param name="StartTimeColumn"></param>
+		/// <param name="Table"><inheritdoc cref="TemporalComparer.TemporalComparer(DataTable)" path="/param[@name='Table']"/></param>
+		/// <param name="StartTimeColumn">A <see cref="DateTime"/> column that designates the period start column.  The column must belong to the DataTable.</param>
 		public TemporalComparer(DataTable Table, DataColumn StartTimeColumn)
 		{
 			this.Table = Table;
@@ -56,6 +63,9 @@ namespace Strick.Temporal
 		}
 
 
+		/// <summary>
+		/// The DataTable that is being searched for changes
+		/// </summary>
 		public DataTable Table { get; }
 
 
@@ -73,7 +83,7 @@ namespace Strick.Temporal
 		public bool IncludeStartTimeColumn { get; set; } = false;
 
 
-		protected DataColumn etcol;
+		private DataColumn etcol;
 
 		/// <summary>
 		/// Optional.  Designates the period end column.  Upon instantiation, will search the DataTable for a column of DateTime type named "SysEndTime".  
@@ -97,10 +107,14 @@ namespace Strick.Temporal
 		/// </summary>
 		public bool IncludeEndTimeColumn { get; set; } = false;
 
+		/// <summary>
+		/// Returns a boolean indicating whether or not a period end column is specified.
+		/// <para>See <see cref="EndTimeColumn"/></para>
+		/// </summary>
 		public bool HasEndTimeColumn => EndTimeColumn != null;
 
 
-		protected DataColumn uidcol;
+		private DataColumn uidcol;
 
 		/// <summary>
 		/// Designates the column containing an ID for the User who made the changes.  Leave null if there is no such column in the DataTable.
@@ -122,17 +136,24 @@ namespace Strick.Temporal
 		/// </summary>
 		public bool IncludeUserIDColumn { get; set; } = false;
 
+		/// <summary>
+		/// Returns a boolean indicating whether or not a user ID column is specified.
+		/// <para>See <see cref="UserIDColumn"/></para>
+		/// </summary>
 		public bool HasUserIDColumn => UserIDColumn != null;
 
 
 		/// <summary>
-		/// Indicates which column is the key that designates "related" rows.  All rows with the same Key are considered "related".  
+		/// Indicates which column(s) comprise the key that designates "related" rows.  Rows with the same Key are considered "related".  
 		/// Only related rows will be compared to one another.  
 		/// If null (the default), ALL rows in the DataTable are assumed to be related.
-		/// ** Multi-column keys are not supported at this time. **
 		/// </summary>
 		public TemporalComparerColumnList KeyColumns { get; }
 
+		/// <summary>
+		/// Returns a boolean indicating whether any key columns have been specified.
+		/// <para>See <see cref="KeyColumns"/></para>
+		/// </summary>
 		public bool HasKey => KeyColumns != null && KeyColumns.Count > 0;
 
 
@@ -143,7 +164,6 @@ namespace Strick.Temporal
 		/// If BOTH IncludedColumns and ExcludedColumns have specified columns, IncludedColumns takes precedent, and ExcludedColumns is ignored.
 		/// </summary>
 		public TemporalComparerColumnList IncludedColumns { get; }
-
 
 		/// <summary>
 		/// Returns a List&lt;DataColumn&gt; which contains the columns to skip.  
@@ -159,9 +179,9 @@ namespace Strick.Temporal
 		public ListSortDirection ChangesSortDirection { get; set; } = ListSortDirection.Ascending;
 
 
-		protected IEnumerable<DataColumn> Cols;
+		private IEnumerable<DataColumn> Cols;
 
-		protected IEnumerable<DataColumn> GetCols()
+		private IEnumerable<DataColumn> GetCols()
 		{
 			if (IncludedColumns != null && IncludedColumns.Count > 0)
 			{
@@ -179,7 +199,7 @@ namespace Strick.Temporal
 			return (from DataColumn c in Table.Columns select c).Where(c => IncludeCol(c, true));
 		}
 
-		protected bool IncludeCol(DataColumn Col, bool Default)
+		private bool IncludeCol(DataColumn Col, bool Default)
 		{
 			if (!IsValidCol(Col, false))
 			{ return false; }
@@ -217,7 +237,7 @@ namespace Strick.Temporal
 			}
 		}
 
-		protected IEnumerable<RowChange> GetChanges()
+		private IEnumerable<RowChange> GetChanges()
 		{
 			//if no table or only one record
 			if (Table == null || Table.Rows.Count < 2)
@@ -263,7 +283,7 @@ namespace Strick.Temporal
 						{ rc.UserID = NewRow[UserIDColumn]; }
 
 						if (HasKey)
-						{ rc.Key = getKeyValue(NewRow).ToList(); }
+						{ rc.Key = GetKeyValue(NewRow).ToList(); }
 					}
 
 					rc.ColumnChanges.Add(new ColChange(NewRow.Table.Columns.IndexOf(col), col.ColumnName, col.Caption, OldRow[col], NewRow[col]));
@@ -288,7 +308,7 @@ namespace Strick.Temporal
 			return true;
 		}
 
-		private IEnumerable<object> getKeyValue(DataRow row)
+		private IEnumerable<object> GetKeyValue(DataRow row)
 		{
 			foreach (DataColumn col in KeyColumns)
 			{ yield return row[col]; }
@@ -297,6 +317,9 @@ namespace Strick.Temporal
 
 		private IEnumerable<RowChange> Sort(IEnumerable<RowChange> chg, ListSortDirection sortDirection)
 		{
+			if(sortDirection == ListSortDirection.Ascending)
+			{ return chg; }
+
 			if (!HasKey)
 			{ return chg.OrderByDescending(rc => rc.ChangeTime); }
 
@@ -314,10 +337,12 @@ namespace Strick.Temporal
 
 
 		/// <summary>
-		/// Checks Col for null and that it belongs to Table.  
+		/// Checks <paramref name="Col"/> for null and that it belongs to Table.  
 		/// If the Throw argument is true, throws an exception if Col is null or does not belong to Table.
 		/// If the Throw argument is false, returns true if Col is not null and belongs to Table, and returns false if either condition is not met.
 		/// </summary>
+		/// <exception cref="ArgumentNullException"></exception>
+		/// <exception cref="ArgumentException"></exception>
 		internal bool IsValidCol(DataColumn Col, bool Throw)
 		{
 			if (Col == null)
