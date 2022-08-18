@@ -2,33 +2,20 @@
 Utilities for working with temporal data in .Net
 
 # Overview
-There are three main objects you will work with.
+These are the primary classes you will work with.
 
-* [`TemporalComparer` object](#temporalcomparer-object)
-* [`RowChange` object](#rowchange-object)
-* [`ColChange` object](#colchange-object)
+* [`TemporalComparer`](#temporalcomparer-class)
+* [`RowChange`](#rowchange-class)
+* [`ColChange`](#colchange-class)
+* [`TemporalComparerColumnList`](#temporalcomparercolumnlist-class)
 
-# `TemporalComparer` object
-The `TemporalComparer` object will find differences in temporal data. It works with a DataTable object containing temporal data.
-
-## DataTable requirements
-* This will work on any DataTable that contains temporal data – it doesn’t have to come specifically from a system versioned (temporal) table.
-
-* One DateTime column is required.  For a system versioned table, this would normally be the `SysStartTime` column.  It will look for a column named `SysStartTime` by default, but you can specify a different column in case your DataTable doesn’t have the standard column.
-
-* For the results to be useful, the DataTable should contain at least one additional column (i.e. the data you actually want to scan for changes).
-
-* It assumes the rows in the DataTable are sorted newest->oldest.  If your DataTable is not sorted this way, you may get no or incorrect results (e.g. the “old” and “new” comparison would be backward if your DataTable is sorted oldest->newest).
-
-* If the rows in the DataTable are NOT all related, it assumes the rows are sorted first by the Key column(s), and newest->oldest within that.  *More on Key in the usage section below…*
-
-* *Optional*. You can set the `Caption` property of any column in your DataTable. The `Caption` property is included in any `ColChange` objects for the column. If not specifically set, the `DataColumn.Caption` property returns the `DataColumn.ColumnName` value.
-  * **Note:** This is new for version 1.1.1
+# `TemporalComparer` class
+The `TemporalComparer` class will find differences in temporal data. It works with a DataTable object containing temporal data.
 
 ## Usage
-* The class to use is `Strick.Temporal.TemporalComparer`.  You’ll have to pass your DataTable to the constructor.
+* Pass your DataTable to the constructor.
 
-* *Optionally*, you can also pass the period start time column to the constructor.  If you don’t pass the column in, it will look for a DateTime type column named `SysStartTime`.  **If the column isn’t found, an exception will be thrown.**
+* *Optionally*, you can also pass the period start time column to the constructor.  If you don’t pass the column to the constructor, the `TemporalComparer` will look for a DateTime type column named `SysStartTime`.  **If the column isn’t found, an exception will be thrown.**
 
 * *Optional*.  You can use the `UserIDColumn` property to indicate which column contains an ID for the user who made the updates on that row.  If you set this, the value from the specified column will be put into the `UserID` property of each `RowChange` object.  If you don’t set this, the `UserID` property in each `RowChange` object will be `null`.
 
@@ -47,7 +34,7 @@ The `TemporalComparer` object will find differences in temporal data. It works w
 
 * You can do different comparisons on the same data simply by changing either the `IncludedColumns` or `ExcludedColumns` properties and accessing the `Changes` property again. For example:
 
-	```
+	```c#
 	TemporalComparer tc = new(myTable);
 	tc.IncludedColumns.Add(myTable.Columns["someColName"]);
 	var someColChanges = tc.Changes; //changes only for column "someColName"
@@ -56,6 +43,20 @@ The `TemporalComparer` object will find differences in temporal data. It works w
 	var otherColChanges = tc.Changes; //changes only for column "otherColName"
 	```
 
+## DataTable requirements
+* This will work on any DataTable that contains temporal data – it doesn’t have to come specifically from a system versioned (temporal) table.
+
+* One DateTime column is required.  For a system versioned table, this would normally be the `SysStartTime` column.  It will look for a column named `SysStartTime` by default, but you can specify a different column in case your DataTable doesn’t have the standard column.
+
+* For the results to be useful, the DataTable should contain at least one additional column (i.e. the data you actually want to scan for changes).
+
+* It assumes the rows in the DataTable are sorted newest->oldest.  If your DataTable is not sorted this way, you may get no or incorrect results (e.g. the “old” and “new” comparison would be backward if your DataTable is sorted oldest->newest).
+
+* If the rows in the DataTable are NOT all related, it assumes the rows are sorted first by the Key column(s), and newest->oldest within that.  *More on Key in the usage section below…*
+
+* *Optional*. You can set the `Caption` property of any column in your DataTable. The `Caption` property is included in any `ColChange` objects for the column. If not specifically set, the `DataColumn.Caption` property returns the `DataColumn.ColumnName` value.
+  * **Note:** This is new for version 1.1.1
+
 ## Results
 
 Use the `Changes` property to retrieve an `IEnumerable<RowChange>` sequence containing the differences found in the DataTable. Accessing the `Changes` property invokes the `TemporalComparer` object's scan of the DataTable.
@@ -63,8 +64,9 @@ Use the `Changes` property to retrieve an `IEnumerable<RowChange>` sequence cont
 **Note that the `Changes` property runs the scan each time it is accessed.  The results are *NOT* cached in the `TemporalComparer` object.**
 
 This could take significant time on a large DataTable.  If your code needs to access `Changes` multiple times, you should store the results, e.g.:
-```
+```c#
 List<RowChange> MyChanges = comparer.Changes.ToList();
+//do stuff with MyChanges
 ```
 Then use that variable to subsequently access the results.
 
@@ -147,13 +149,16 @@ The above sample code returns results (for the DataTable created in the unit tes
     TerminationReason (6)  old:[] new:[Left for another job]
 ```
 
-# `RowChange` object
-Used to represent changes in one or more columns between two related rows in your DataTable.
+# `RowChange` class
+Represents changes between two related rows in your DataTable. The `ColumnChanges` property contains the changes to the individual columns. 
 
-# `ColChange` object
-Used to represent a change in a column between two related rows in your DataTable.
+# `ColChange` class
+Represents a change in a column between two related rows in your DataTable.
 
 **New:** For Version 1.1.1, the `ColChange` class has a new `Caption` property. The Caption property is automatically set by the `TemporalComparer` to the Caption property for the DataColumn.
+
+# `TemporalComparerColumnList` class
+Represents a collection of `DataColumn` objects. Implements the `ICollection<DataColumn>` interface, so the usual collection manipulation methods and properties can be used.
 
 # Other
 
