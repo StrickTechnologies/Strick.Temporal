@@ -158,7 +158,7 @@ Represents a change in a column between two related rows in your DataTable.
 **New:** For Version 1.1.1, the `ColChange` class has a new `Caption` property. The Caption property is automatically set by the `TemporalComparer` to the Caption property for the DataColumn.
 
 # `TemporalComparerColumnList` class
-Represents a collection of `DataColumn` objects. Implements the `ICollection<DataColumn>` interface, so the usual collection manipulation methods and properties can be used.
+Represents a collection of `DataColumn` objects belonging to a specific DataTable. Implements the `ICollection<DataColumn>` interface, so the usual collection manipulation methods (e.g. Add, Remove, Clear) and properties (e.g. Count) can be used.
 
 # Other
 

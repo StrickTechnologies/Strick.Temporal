@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,9 +26,11 @@ namespace Strick.Temporal.Test
 			Assert.IsNotNull(cols);
 			Assert.AreEqual(0, cols.Count);
 
+			Assert.ThrowsException<ArgumentException>(() => cols.Add(null));
+			Assert.AreEqual(0, cols.Count);
+
 			cols.Add(tc.Table.Columns[0]);
 			Assert.AreEqual(1, cols.Count);
-
 
 			Assert.ThrowsException<ArgumentException>(() => cols.Add(tc.Table.Columns["bogus"]));
 			Assert.AreEqual(1, cols.Count);
@@ -41,6 +44,10 @@ namespace Strick.Temporal.Test
 			Assert.AreEqual(2, cols.Count);
 			cols.Clear();
 			Assert.AreEqual(0, cols.Count);
+
+			DataColumn c = new ("foo", typeof(string));
+			Assert.AreEqual(0, cols.Count);
+			Assert.ThrowsException<ArgumentException>(() => cols.Add(c));
 		}
 
 

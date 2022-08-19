@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Strick.Temporal
 {
 	/// <summary>
-	/// Represent a sequence of columns for the DataTable specified in the given <see cref="TemporalComparer"/> object.
+	/// Represents a sequence of columns for the DataTable specified in the given <see cref="TemporalComparer"/> object.
 	/// </summary>
 	public class TemporalComparerColumnList : ICollection<DataColumn>
 	{
@@ -40,10 +40,13 @@ namespace Strick.Temporal
 		public bool IsReadOnly => false;
 
 		/// <summary>
-		/// Adds a column to the collection. If the column does not belong to the DataTable contained in 
+		/// Adds a column to the collection. 
+		/// If the column is null or does not belong to the DataTable contained in the <see cref="TemporalComparer"/> object passed 
+		/// to the constructor, an exception is thrown.
 		/// </summary>
 		public void Add(DataColumn column)
 		{
+			//Todo: this results in an incorrect exception and message if column is null. Why not just allow IsValidCol to throw? Changing it will also require unit test updates
 			if (!Comparer.IsValidCol(column, false))
 			{ throw new ArgumentException("Column does not belong to this table"); }
 
@@ -95,7 +98,14 @@ namespace Strick.Temporal
 		/// <param name="columnNames">A sequence of column names.</param>
 		public void AddRange(IEnumerable<string> columnNames)
 		{
-			foreach(string cNm in columnNames)
+			//Todo: Possible bug to investigate.
+			//      if both valid and invalid column names are included in columnNames, it will
+			//      result in some cases in some of the columns being added and some not being added.
+			//      It might be ok, but we just need to decide.
+			//      One solution would be to scan the names first, and throw if any were invalid.
+			//        If the scan passed, all the columns could then be added.
+			//      Also see unit test, the condition is noted there.
+			foreach (string cNm in columnNames)
 			{
 				Add(Comparer.Table.Columns[cNm]);
 			}
