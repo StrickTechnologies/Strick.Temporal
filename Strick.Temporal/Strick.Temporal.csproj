@@ -3,16 +3,33 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;</TargetFrameworks>
     <Copyright>Copyright (c) 2020-2022 Strick Technologies, LLC. All rights reserved.</Copyright>
-    <Version>1.2.0</Version>
-    <Authors>Strick Technologies, LLC.; Jim Strickland</Authors>
+    <Version>1.2.1</Version>
+    <Authors>Strick Technologies, LLC.</Authors>
     <Company>Strick Technologies, LLC.</Company>
     <Description>Utilities for working with temporal data in .Net</Description>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageProjectUrl>https://github.com/StrickTechnologies/Strick.Temporal</PackageProjectUrl>
+    <PackageIcon>STLogoS2_128s_Trans.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/StrickTechnologies/Strick.Temporal</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile></DocumentationFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="Y:\Strick Technologies\Logos\STLogoS2_128s_Trans.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="System.Data.SqlClient" Version="4.8.1" />
