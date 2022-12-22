@@ -21,7 +21,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="STLogoS2_128s_Trans.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\STLogoS2_128s_Trans.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
